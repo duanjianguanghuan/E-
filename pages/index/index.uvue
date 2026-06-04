@@ -1,24 +1,537 @@
 <template>
-	<view>
-		<image class="logo" src="/static/logo.png"></image>
-		<text class="title">{{title}}</text>
+	<view :class="['home-page', themeClass]">
+		<!-- 状态栏占位 -->
+		<view :class="['status-bar', themeClass]"></view>
+
+		<!-- 顶部导航 -->
+		<view :class="['navbar', themeClass]">
+			<view class="navbar-left">
+				<text :class="['greeting', themeClass]">{{ greetingText }}</text>
+				<text :class="['subtitle', themeClass]">发现精彩旅程</text>
+			</view>
+			<view :class="['nav-actions', themeClass]">
+				<view :class="['icon-btn', themeClass]" @tap="goSettings">
+					<text :class="['icon-text', themeClass]">⚙</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 搜索栏 -->
+		<view :class="['search-bar', themeClass]">
+			<text class="search-icon">🔍</text>
+			<text :class="['search-placeholder', themeClass]">搜索目的地、活动...</text>
+		</view>
+
+		<!-- 功能快捷入口 -->
+		<view class="quick-actions">
+			<view :class="['action-item', themeClass]" v-for="action in quickActions" :key="action.label" @tap="() => onAction(action.label)">
+				<view :class="['action-icon-wrap', themeClass]">
+					<text class="action-emoji">{{ action.icon }}</text>
+				</view>
+				<text :class="['action-label', themeClass]">{{ action.label }}</text>
+			</view>
+		</view>
+
+		<!-- 推荐卡片区域 -->
+		<view class="section-header">
+			<text :class="['section-label', themeClass]">热门推荐</text>
+			<text :class="['section-more', themeClass]">查看全部 →</text>
+		</view>
+
+		<scroll-view scroll-x="true" class="card-scroll" show-scrollbar="false">
+			<view :class="['recommend-card', themeClass]" v-for="card in recommendCards" :key="card.title">
+				<view :class="['card-img-placeholder', themeClass]">
+					<text class="card-emoji">{{ card.emoji }}</text>
+				</view>
+				<view class="card-text">
+					<text :class="['card-title', themeClass]">{{ card.title }}</text>
+					<text :class="['card-sub', themeClass]">{{ card.desc }}</text>
+				</view>
+				<view :class="['card-tag', themeClass]">
+					<text :class="['tag-text', themeClass]">{{ card.tag }}</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 列表区域 -->
+		<view class="section-header">
+			<text :class="['section-label', themeClass]">最近活动</text>
+			<text :class="['section-more', themeClass]">查看更多 →</text>
+		</view>
+
+		<view :class="['list-item', themeClass]" v-for="item in activityList" :key="item.title">
+			<view :class="['list-img-placeholder', themeClass]">
+				<text class="list-emoji">{{ item.emoji }}</text>
+			</view>
+			<view class="list-content">
+				<text :class="['list-title', themeClass]">{{ item.title }}</text>
+				<text :class="['list-desc', themeClass]">{{ item.desc }}</text>
+				<view class="list-meta">
+					<text :class="['meta-text', themeClass]">{{ item.date }}</text>
+					<text :class="['meta-text', themeClass]">{{ item.location }}</text>
+				</view>
+			</view>
+			<view :class="['list-arrow', themeClass]">
+				<text :class="['arrow-icon', themeClass]">›</text>
+			</view>
+		</view>
+
+		<!-- 底部安全区 -->
+		<view class="bottom-safe"></view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	const title = ref('Hello')
+	import { useTheme } from '@/composables/useTheme'
+	import { ref, computed } from 'vue'
+
+	const { currentTheme, isLiquidGlass, isNormal } = useTheme()
+
+	const themeClass = computed(() => {
+		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
+	})
+
+	const greetingText = computed(() => {
+		const hour = new Date().getHours()
+		if (hour < 12) return '早上好 ☀️'
+		if (hour < 18) return '下午好 🌤'
+		return '晚上好 🌙'
+	})
+
+	const quickActions = ref([
+		{ icon: '🏖️', label: '景点' },
+		{ icon: '🍜', label: '美食' },
+		{ icon: '🏨', label: '住宿' },
+		{ icon: '🗺️', label: '路线' },
+	])
+
+	const recommendCards = ref([
+		{ emoji: '🏔️', title: '雪山秘境', desc: '探索绝美雪山风光', tag: '热门' },
+		{ emoji: '🏖️', title: '海岸线之旅', desc: '阳光沙滩度假天堂', tag: '推荐' },
+		{ emoji: '🏯', title: '古镇漫步', desc: '体验千年文化韵味', tag: '新上线' },
+		{ emoji: '🌲', title: '森林徒步', desc: '拥抱大自然氧吧', tag: '精选' },
+	])
+
+	const activityList = ref([
+		{ emoji: '🎵', title: '夏日音乐节', desc: '海滩落日音乐盛宴', date: '7月15日', location: '三亚' },
+		{ emoji: '🎨', title: '城市艺术展', desc: '当代艺术沉浸体验', date: '7月20日', location: '上海' },
+		{ emoji: '🏃', title: '环湖马拉松', desc: '湖畔奔跑挑战自我', date: '8月1日', location: '杭州' },
+		{ emoji: '🍷', title: '葡萄酒品鉴', desc: '庄园美酒品味之旅', date: '8月5日', location: '宁夏' },
+	])
+
+	function goSettings() {
+		uni.navigateTo({
+			url: '/pages/settings/settings'
+		})
+	}
+
+	function onAction(label: string) {
+		uni.showToast({
+			title: `进入${label}`,
+			icon: 'none'
+		})
+	}
 </script>
 
 <style>
-	.logo {
-		height: 100px;
-		width: 100px;
-		margin: 100px auto 25px auto;
+	/* ========== 普通主题 ========== */
+	.home-page {
+		min-height: 100vh;
 	}
 
-	.title {
-		font-size: 18px;
-		color: #8f8f94;
-		text-align: center;
+	.home-page.theme-normal {
+		background-color: #f2f2f7;
+	}
+
+	.status-bar {
+		height: 44px;
+		background-color: #ffffff;
+	}
+
+	.navbar {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 16px 20px 20px 20px;
+		background-color: #ffffff;
+	}
+
+	.navbar-left {
+		flex-direction: column;
+	}
+
+	.greeting {
+		font-size: 24px;
+		font-weight: 800;
+		color: #1c1c1e;
+		letter-spacing: -0.5px;
+	}
+
+	.subtitle {
+		font-size: 14px;
+		color: #8e8e93;
+		margin-top: 2px;
+	}
+
+	.nav-actions {
+		flex-direction: row;
+		gap: 10px;
+	}
+
+	.icon-btn {
+		width: 42px;
+		height: 42px;
+		border-radius: 14px;
+		background-color: #f2f2f7;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.icon-text {
+		font-size: 20px;
+	}
+
+	.search-bar {
+		flex-direction: row;
+		align-items: center;
+		margin: 16px 20px;
+		padding: 12px 16px;
+		border-radius: 14px;
+		background-color: #ffffff;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.06);
+		gap: 10px;
+	}
+
+	.search-icon {
+		font-size: 16px;
+	}
+
+	.search-placeholder {
+		font-size: 15px;
+		color: #8e8e93;
+	}
+
+	.quick-actions {
+		flex-direction: row;
+		justify-content: space-around;
+		padding: 8px 16px;
+		margin: 0 4px;
+	}
+
+	.action-item {
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+	}
+
+	.action-icon-wrap {
+		width: 52px;
+		height: 52px;
+		border-radius: 16px;
+		background-color: #ffffff;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.06);
+		align-items: center;
+		justify-content: center;
+	}
+
+	.action-emoji {
+		font-size: 24px;
+	}
+
+	.action-label {
+		font-size: 12px;
+		font-weight: 600;
+		color: #1c1c1e;
+	}
+
+	.section-header {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px 20px 12px 20px;
+	}
+
+	.section-label {
+		font-size: 17px;
+		font-weight: 700;
+		color: #1c1c1e;
+	}
+
+	.section-more {
+		font-size: 13px;
+		color: #007aff;
+		font-weight: 500;
+	}
+
+	.card-scroll {
+		width: 100%;
+		white-space: nowrap;
+		padding-left: 20px;
+	}
+
+	.recommend-card {
+		width: 220px;
+		display: inline-flex;
+		flex-direction: column;
+		margin-right: 12px;
+		border-radius: 18px;
+		background-color: #ffffff;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.06);
+		overflow: hidden;
+		vertical-align: top;
+	}
+
+	.card-img-placeholder {
+		height: 110px;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #e8f0fe, #dbe8ff);
+	}
+
+	.card-emoji {
+		font-size: 40px;
+	}
+
+	.card-text {
+		padding: 12px 14px 6px 14px;
+		flex-direction: column;
+	}
+
+	.card-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: #1c1c1e;
+	}
+
+	.card-sub {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 4px;
+	}
+
+	.card-tag {
+		margin: 4px 14px 12px 14px;
+		padding: 3px 10px;
+		border-radius: 8px;
+		background-color: #007aff;
+		align-self: flex-start;
+	}
+
+	.tag-text {
+		font-size: 11px;
+		color: #fff;
+		font-weight: 600;
+	}
+
+	.list-item {
+		flex-direction: row;
+		align-items: center;
+		padding: 14px 20px;
+		margin: 0 16px 10px 16px;
+		border-radius: 16px;
+		background-color: #ffffff;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.list-img-placeholder {
+		width: 50px;
+		height: 50px;
+		border-radius: 12px;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #f0e8ff, #e8f0ff);
+		margin-right: 14px;
+	}
+
+	.list-emoji {
+		font-size: 24px;
+	}
+
+	.list-content {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.list-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: #1c1c1e;
+	}
+
+	.list-desc {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 3px;
+	}
+
+	.list-meta {
+		flex-direction: row;
+		gap: 12px;
+		margin-top: 6px;
+	}
+
+	.meta-text {
+		font-size: 11px;
+		color: #b0b0b8;
+	}
+
+	.list-arrow {
+		width: 30px;
+		align-items: flex-end;
+		justify-content: center;
+	}
+
+	.arrow-icon {
+		font-size: 22px;
+		color: #c7c7cc;
+		font-weight: 300;
+	}
+
+	.bottom-safe {
+		height: 34px;
+	}
+
+	/* ===================================== */
+	/*          🧊 液体玻璃主题样式           */
+	/* ===================================== */
+
+	.home-page.theme-glass {
+		background: linear-gradient(160deg, #0a0a1a 0%, #1a1030 25%, #0d1b2a 50%, #0f0f24 75%, #0a0a1a 100%);
+		background-attachment: fixed;
+	}
+
+	.status-bar.theme-glass {
+		background: rgba(255, 255, 255, 0.03);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+	}
+
+	.navbar.theme-glass {
+		background: rgba(255, 255, 255, 0.03);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	.greeting.theme-glass {
+		color: rgba(255, 255, 255, 0.92);
+	}
+
+	.subtitle.theme-glass {
+		color: rgba(190, 205, 235, 0.55);
+	}
+
+	.icon-btn.theme-glass {
+		background: rgba(255, 255, 255, 0.06);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 14px;
+	}
+
+	.search-bar.theme-glass {
+		background: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 16px;
+		box-shadow:
+			0 4px 16px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.search-placeholder.theme-glass {
+		color: rgba(180, 200, 230, 0.45);
+	}
+
+	.action-icon-wrap.theme-glass {
+		background: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	}
+
+	.action-label.theme-glass {
+		color: rgba(210, 220, 245, 0.8);
+	}
+
+	.section-label.theme-glass {
+		color: rgba(240, 245, 255, 0.88);
+	}
+
+	.section-more.theme-glass {
+		color: rgba(120, 160, 255, 0.8);
+	}
+
+	.recommend-card.theme-glass {
+		background: rgba(255, 255, 255, 0.04);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: 20px;
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	}
+
+	.card-img-placeholder.theme-glass {
+		background: linear-gradient(135deg, rgba(100, 140, 255, 0.15), rgba(140, 100, 255, 0.1));
+	}
+
+	.card-title.theme-glass {
+		color: rgba(235, 240, 255, 0.9);
+	}
+
+	.card-sub.theme-glass {
+		color: rgba(180, 195, 225, 0.5);
+	}
+
+	.card-tag.theme-glass {
+		background: rgba(100, 140, 255, 0.25);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid rgba(120, 160, 255, 0.2);
+	}
+
+	.tag-text.theme-glass {
+		color: rgba(180, 210, 255, 0.9);
+	}
+
+	.list-item.theme-glass {
+		background: rgba(255, 255, 255, 0.04);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 16px;
+		box-shadow:
+			0 4px 16px rgba(0, 0, 0, 0.25),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.list-img-placeholder.theme-glass {
+		background: linear-gradient(135deg, rgba(120, 100, 200, 0.2), rgba(100, 140, 220, 0.15));
+	}
+
+	.list-title.theme-glass {
+		color: rgba(235, 240, 255, 0.9);
+	}
+
+	.list-desc.theme-glass {
+		color: rgba(180, 195, 225, 0.5);
+	}
+
+	.meta-text.theme-glass {
+		color: rgba(160, 175, 210, 0.4);
+	}
+
+	.arrow-icon.theme-glass {
+		color: rgba(160, 180, 220, 0.35);
 	}
 </style>

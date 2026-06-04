@@ -2,9 +2,14 @@
 	// #ifdef APP-ANDROID || APP-HARMONY
 	let firstBackTime = 0
 	// #endif
+
+	import { useTheme } from '@/composables/useTheme'
+
 	export default {
 		onLaunch() {
 			console.log('App Launch')
+			const { currentTheme } = useTheme()
+			console.log('当前主题: ' + currentTheme.value)
 		},
 		onShow() {
 			console.log('App Show')
@@ -37,7 +42,12 @@
 </script>
 
 <style>
-	/*每个页面公共css */
+	page {
+		background-color: #f2f2f7;
+		font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+		-webkit-font-smoothing: antialiased;
+	}
+
 	.uni-row {
 		flex-direction: row;
 	}
