@@ -1,31 +1,31 @@
 <template>
 	<view :class="['home-page', themeClass]">
-		<!-- 状态栏占位 -->
-		<view :class="['status-bar', themeClass]"></view>
-
-		<!-- 顶部导航 -->
-		<view :class="['navbar', themeClass]">
-			<view class="navbar-left">
-				<text :class="['greeting', themeClass]">E游周享</text>
-				<text :class="['subtitle', themeClass]">Epic 每周免费游戏资讯</text>
-			</view>
-			<view :class="['nav-actions', themeClass]">
-				<view :class="['icon-btn', themeClass]" @tap="refreshData">
-					<text :class="['icon-text', themeClass]">↻</text>
+		<!-- 顶部导航栏 -->
+		<view :class="['navbar-wrap', themeClass]">
+			<view :class="['status-bar', themeClass]"></view>
+			<view :class="['navbar', themeClass]">
+				<view class="navbar-left">
+					<text :class="['greeting', themeClass]">E游周享</text>
+					<text :class="['subtitle', themeClass]">Epic 每周免费游戏资讯</text>
 				</view>
-				<view :class="['icon-btn', themeClass]" @tap="goSettings">
-					<text :class="['icon-text', themeClass]">⚙</text>
+				<view class="navbar-right">
+					<view :class="['icon-btn', themeClass]" @tap="refreshData">
+						<text :class="['icon-text', themeClass]">↻</text>
+					</view>
+					<view :class="['icon-btn', themeClass]" @tap="goSettings">
+						<text :class="['icon-text', themeClass]">⚙</text>
+					</view>
 				</view>
 			</view>
 		</view>
 
 		<!-- 加载状态 -->
 		<view v-if="loading" :class="['loading-wrap', themeClass]">
-			<text :class="['loading-text', themeClass]">加载中...</text>
+			<text :class="['loading-text', themeClass]">正在加载...</text>
 		</view>
 
 		<!-- 错误状态 -->
-		<view v-if="errorMsg && !loading" :class="['error-wrap', themeClass]">
+		<view v-else-if="hasError" :class="['error-wrap', themeClass]">
 			<text class="error-emoji">😵</text>
 			<text :class="['error-text', themeClass]">{{ errorMsg }}</text>
 			<view :class="['retry-btn', themeClass]" @tap="refreshData">
@@ -34,62 +34,74 @@
 		</view>
 
 		<!-- 数据内容 -->
-		<view v-if="!loading && !errorMsg" class="content-wrap">
+		<view v-else class="content-wrap">
 			<!-- 本周免费游戏 -->
-			<view class="section-header">
-				<text :class="['section-label', themeClass]">🎮 本周免费</text>
-				<text :class="['section-badge', themeClass]">限时领取</text>
+			<view v-if="freeNowGames.length > 0">
+				<view class="section-header">
+					<text :class="['section-label', themeClass]">本周免费</text>
+					<text :class="['section-badge', themeClass]">限时领取</text>
+				</view>
+
+				<scroll-view scroll-x="true" class="card-scroll" show-scrollbar="false">
+					<view class="card-scroll-inner">
+						<view
+							:class="['game-card', themeClass]"
+							v-for="game in freeNowGames"
+							:key="game.id"
+							@tap="() => openGameLink(game.link)"
+						>
+							<image
+								:class="['game-cover', themeClass]"
+								:src="game.cover"
+								mode="aspectFill"
+							/>
+							<view class="game-info">
+								<text :class="['game-title', themeClass]">{{ game.title }}</text>
+								<text :class="['game-desc', themeClass]">{{ game.description }}</text>
+								<view :class="['game-meta', themeClass]">
+									<text :class="['game-tag-free', themeClass]">免费</text>
+									<text :class="['game-time', themeClass]">
+										截止 {{ formatFreeTime(game.free_end) }}
+									</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</scroll-view>
 			</view>
 
-			<scroll-view scroll-x="true" class="card-scroll" show-scrollbar="false">
-				<view
-					:class="['game-card', themeClass]"
-					v-for="game in freeNowGames"
-					:key="game.id"
-					@tap="() => openGameLink(game.link)"
-				>
+			<!-- 即将推出 -->
+			<view v-if="upcomingGames.length > 0">
+				<view class="section-header">
+					<text :class="['section-label', themeClass]">即将推出</text>
+					<text :class="['section-badge-outline', themeClass]">敬请期待</text>
+				</view>
+
+				<view :class="['list-item', themeClass]" v-for="game in upcomingGames" :key="game.id">
 					<image
-						:class="['game-cover', themeClass]"
+						:class="['list-cover', themeClass]"
 						:src="game.cover"
 						mode="aspectFill"
 					/>
-					<view class="game-info">
-						<text :class="['game-title', themeClass]">{{ game.title }}</text>
-						<text :class="['game-desc', themeClass]">{{ game.description }}</text>
-						<view :class="['game-meta', themeClass]">
-							<text :class="['game-tag-free', themeClass]">免费</text>
-							<text :class="['game-time', themeClass]">
-								截止 {{ formatFreeTime(game.free_end) }}
+					<view class="list-content">
+						<text :class="['list-title', themeClass]">{{ game.title }}</text>
+						<text :class="['list-desc', themeClass]">{{ game.description }}</text>
+						<view class="list-meta">
+							<text :class="['meta-text', themeClass]">
+								{{ formatFreeTime(game.free_start) }} 起
 							</text>
 						</view>
 					</view>
-				</view>
-			</scroll-view>
-
-			<!-- 即将推出 -->
-			<view class="section-header">
-				<text :class="['section-label', themeClass]">📅 即将推出</text>
-				<text :class="['section-badge-outline', themeClass]">敬请期待</text>
-			</view>
-
-			<view :class="['list-item', themeClass]" v-for="game in upcomingGames" :key="game.id">
-				<image
-					:class="['list-cover', themeClass]"
-					:src="game.cover"
-					mode="aspectFill"
-				/>
-				<view class="list-content">
-					<text :class="['list-title', themeClass]">{{ game.title }}</text>
-					<text :class="['list-desc', themeClass]">{{ game.description }}</text>
-					<view class="list-meta">
-						<text :class="['meta-text', themeClass]">
-							{{ formatFreeTime(game.free_start) }} 起
-						</text>
+					<view :class="['list-badge', themeClass]">
+						<text :class="['badge-text', themeClass]">预告</text>
 					</view>
 				</view>
-				<view :class="['list-badge', themeClass]">
-					<text :class="['badge-text', themeClass]">预告</text>
-				</view>
+			</view>
+
+			<!-- 空数据 -->
+			<view v-if="freeNowGames.length === 0 && upcomingGames.length === 0" :class="['empty-wrap', themeClass]">
+				<text class="empty-emoji">📭</text>
+				<text :class="['empty-text', themeClass]">暂无游戏数据</text>
 			</view>
 
 			<!-- 底部提示 -->
@@ -117,21 +129,25 @@
 		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
 	})
 
-	const loading = ref(false)
+	/* ========== 数据状态 ========== */
+	const loading = ref(true)
 	const errorMsg = ref<string | null>(null)
 	const freeNowGames = ref<EpicGame[]>([])
 	const upcomingGames = ref<EpicGame[]>([])
 
+	const hasError = computed(() => errorMsg.value !== null)
+
+	/* ========== 数据加载 ========== */
 	async function loadGames() {
 		loading.value = true
 		errorMsg.value = null
 
 		const result = await fetchEpicGames()
-		if (result.success && result.data) {
+		if (result.success && result.data != null) {
 			freeNowGames.value = getFreeNowGames(result.data.data)
 			upcomingGames.value = getUpcomingGames(result.data.data)
 		} else {
-			errorMsg.value = result.message ?? '加载失败'
+			errorMsg.value = result.message
 		}
 		loading.value = false
 	}
@@ -140,6 +156,7 @@
 		loadGames()
 	}
 
+	/* ========== 交互 ========== */
 	function openGameLink(link: string) {
 		if (!link || link.includes('[]')) {
 			uni.showToast({
@@ -160,18 +177,26 @@
 		})
 	}
 
-	// 初始化加载
+	/* ========== 初始化 ========== */
 	loadGames()
 </script>
 
 <style>
-	/* ========== 普通主题 ========== */
+	/* ===================================== */
+	/*              普通主题                  */
+	/* ===================================== */
+
 	.home-page {
 		min-height: 100vh;
 	}
 
 	.home-page.theme-normal {
 		background-color: #f2f2f7;
+	}
+
+	/* ---------- 导航栏 ---------- */
+	.navbar-wrap {
+		background-color: #ffffff;
 	}
 
 	.status-bar {
@@ -191,22 +216,24 @@
 		flex-direction: column;
 	}
 
+	.navbar-right {
+		flex-direction: row;
+		gap: 10px;
+	}
+
 	.greeting {
 		font-size: 24px;
 		font-weight: 800;
 		color: #1c1c1e;
 		letter-spacing: -0.5px;
+		lines: 1;
 	}
 
 	.subtitle {
 		font-size: 14px;
 		color: #8e8e93;
 		margin-top: 2px;
-	}
-
-	.nav-actions {
-		flex-direction: row;
-		gap: 10px;
+		lines: 1;
 	}
 
 	.icon-btn {
@@ -222,9 +249,9 @@
 		font-size: 20px;
 	}
 
-	/* ========== 加载 / 错误 ========== */
+	/* ---------- 加载状态 ---------- */
 	.loading-wrap {
-		padding: 80px 20px;
+		padding: 120px 20px;
 		align-items: center;
 		justify-content: center;
 	}
@@ -234,14 +261,15 @@
 		color: #8e8e93;
 	}
 
+	/* ---------- 错误状态 ---------- */
 	.error-wrap {
 		padding: 80px 40px;
 		align-items: center;
-		gap: 12px;
 	}
 
 	.error-emoji {
 		font-size: 48px;
+		margin-bottom: 12px;
 	}
 
 	.error-text {
@@ -249,10 +277,10 @@
 		color: #8e8e93;
 		text-align: center;
 		line-height: 1.5;
+		margin-bottom: 16px;
 	}
 
 	.retry-btn {
-		margin-top: 8px;
 		padding: 10px 28px;
 		border-radius: 12px;
 		background-color: #007aff;
@@ -264,7 +292,23 @@
 		font-weight: 600;
 	}
 
-	/* ========== 区域标题 ========== */
+	/* ---------- 空数据状态 ---------- */
+	.empty-wrap {
+		padding: 60px 20px;
+		align-items: center;
+	}
+
+	.empty-emoji {
+		font-size: 40px;
+		margin-bottom: 8px;
+	}
+
+	.empty-text {
+		font-size: 14px;
+		color: #8e8e93;
+	}
+
+	/* ---------- 区域标题 ---------- */
 	.section-header {
 		flex-direction: row;
 		justify-content: space-between;
@@ -300,16 +344,19 @@
 		padding-bottom: 20px;
 	}
 
-	/* ========== 游戏卡片（横向滚动）========== */
+	/* ---------- 横向滚动卡片 ---------- */
 	.card-scroll {
 		width: 100%;
-		white-space: nowrap;
+	}
+
+	.card-scroll-inner {
+		flex-direction: row;
 		padding-left: 20px;
+		padding-right: 8px;
 	}
 
 	.game-card {
-		width: 240px;
-		display: inline-flex;
+		width: 220px;
 		flex-direction: column;
 		margin-right: 12px;
 		border-radius: 18px;
@@ -317,12 +364,12 @@
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 		border: 1px solid rgba(0, 0, 0, 0.06);
 		overflow: hidden;
-		vertical-align: top;
+		flex-shrink: 0;
 	}
 
 	.game-cover {
-		width: 100%;
-		height: 135px;
+		width: 220px;
+		height: 124px;
 		background-color: #e8e8ed;
 	}
 
@@ -364,9 +411,10 @@
 	.game-time {
 		font-size: 11px;
 		color: #b0b0b8;
+		lines: 1;
 	}
 
-	/* ========== 即将推出列表 ========== */
+	/* ---------- 即将推出列表 ---------- */
 	.list-item {
 		flex-direction: row;
 		align-items: center;
@@ -431,7 +479,7 @@
 		font-weight: 500;
 	}
 
-	/* ========== 底部提示 ========== */
+	/* ---------- 底部 ---------- */
 	.footer-tip {
 		padding: 20px;
 		align-items: center;
@@ -448,24 +496,24 @@
 	}
 
 	/* ===================================== */
-	/*          🧊 液体玻璃主题样式           */
+	/*           液体玻璃主题                 */
 	/* ===================================== */
 
 	.home-page.theme-glass {
 		background: linear-gradient(160deg, #0a0a1a 0%, #1a1030 25%, #0d1b2a 50%, #0f0f24 75%, #0a0a1a 100%);
-		background-attachment: fixed;
+	}
+
+	/* 导航栏 */
+	.navbar-wrap.theme-glass {
+		background: rgba(255, 255, 255, 0.03);
 	}
 
 	.status-bar.theme-glass {
 		background: rgba(255, 255, 255, 0.03);
-		backdrop-filter: blur(20px);
-		-webkit-backdrop-filter: blur(20px);
 	}
 
 	.navbar.theme-glass {
 		background: rgba(255, 255, 255, 0.03);
-		backdrop-filter: blur(20px);
-		-webkit-backdrop-filter: blur(20px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
@@ -479,24 +527,21 @@
 
 	.icon-btn.theme-glass {
 		background: rgba(255, 255, 255, 0.06);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 14px;
 	}
 
+	/* 加载 */
 	.loading-text.theme-glass {
 		color: rgba(200, 210, 240, 0.5);
 	}
 
+	/* 错误 */
 	.error-text.theme-glass {
 		color: rgba(200, 210, 240, 0.5);
 	}
 
 	.retry-btn.theme-glass {
 		background: rgba(120, 160, 255, 0.25);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
 		border: 1px solid rgba(120, 160, 255, 0.2);
 	}
 
@@ -504,6 +549,7 @@
 		color: rgba(180, 210, 255, 0.9);
 	}
 
+	/* 区域标题 */
 	.section-label.theme-glass {
 		color: rgba(240, 245, 255, 0.88);
 	}
@@ -513,15 +559,11 @@
 		color: rgba(140, 180, 255, 0.85);
 	}
 
+	/* 游戏卡片 */
 	.game-card.theme-glass {
 		background: rgba(255, 255, 255, 0.04);
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
 		border: 1px solid rgba(255, 255, 255, 0.07);
-		border-radius: 20px;
-		box-shadow:
-			0 8px 24px rgba(0, 0, 0, 0.3),
-			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 	}
 
 	.game-cover.theme-glass {
@@ -536,10 +578,6 @@
 		color: rgba(180, 195, 225, 0.5);
 	}
 
-	.game-meta.theme-glass {
-		gap: 8px;
-	}
-
 	.game-tag-free.theme-glass {
 		background: rgba(52, 199, 89, 0.3);
 		color: rgba(130, 255, 160, 0.9);
@@ -549,15 +587,11 @@
 		color: rgba(160, 175, 210, 0.4);
 	}
 
+	/* 列表 */
 	.list-item.theme-glass {
 		background: rgba(255, 255, 255, 0.04);
-		backdrop-filter: blur(14px);
-		-webkit-backdrop-filter: blur(14px);
 		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 16px;
-		box-shadow:
-			0 4px 16px rgba(0, 0, 0, 0.25),
-			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 	}
 
 	.list-cover.theme-glass {
@@ -584,7 +618,12 @@
 		color: rgba(180, 200, 230, 0.5);
 	}
 
+	/* 底部 */
 	.tip-text.theme-glass {
 		color: rgba(160, 180, 210, 0.3);
+	}
+
+	.empty-text.theme-glass {
+		color: rgba(200, 210, 240, 0.5);
 	}
 </style>

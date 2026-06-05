@@ -34,6 +34,11 @@ export interface ApiResult<T> {
 	message: string
 }
 
+interface RequestOptions {
+	method?: 'GET' | 'POST'
+	timeout?: number
+}
+
 /* ========== 常量 ========== */
 
 const API_BASE = 'https://60s.viki.moe/v2'
@@ -45,7 +50,7 @@ const REQUEST_TIMEOUT = 15000
 function request<T>(url: string, options: RequestOptions = {}): Promise<ApiResult<T>> {
 	return new Promise((resolve) => {
 		uni.request({
-			url,
+			url: url,
 			method: options.method ?? 'GET',
 			timeout: options.timeout ?? REQUEST_TIMEOUT,
 			success: (res) => {
@@ -88,21 +93,21 @@ export function fetchEpicGames(): Promise<ApiResult<EpicResponse>> {
 }
 
 /**
- * 获取当前可免费领取的游戏
+ * 筛选当前可免费领取的游戏
  */
 export function getFreeNowGames(games: EpicGame[]): EpicGame[] {
 	return games.filter((g) => g.is_free_now)
 }
 
 /**
- * 获取即将免费的游戏
+ * 筛选即将免费的游戏
  */
 export function getUpcomingGames(games: EpicGame[]): EpicGame[] {
 	return games.filter((g) => !g.is_free_now)
 }
 
 /**
- * 格式化时间戳为可读日期
+ * 格式化日期字符串 (YYYY/MM/DD → YYYY-MM-DD)
  */
 export function formatFreeTime(dateStr: string): string {
 	if (!dateStr) return ''
