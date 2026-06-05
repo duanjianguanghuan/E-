@@ -3,85 +3,106 @@
 		<!-- 头部 -->
 		<view :class="['header', themeClass]">
 			<view class="header-content">
-				<text :class="['back-btn', themeClass]" @tap="goBack">←</text>
+				<view class="back-btn" @tap="goBack">
+					<text :class="['back-icon', themeClass]">←</text>
+				</view>
 				<text :class="['header-title', themeClass]">设置</text>
 				<view class="header-spacer"></view>
 			</view>
 		</view>
 
-		<!-- 主题切换区域 -->
-		<view :class="['section', themeClass]">
-			<text :class="['section-title', themeClass]">界面主题</text>
-			<text :class="['section-desc', themeClass]">选择你喜欢的界面风格</text>
+		<!-- 页面内容 -->
+		<scroll-view scroll-y="true" class="content-scroll">
+			<!-- 主题切换 -->
+			<view :class="['section', themeClass]">
+				<view class="section-header">
+					<text :class="['section-title', themeClass]">界面主题</text>
+					<text :class="['section-desc', themeClass]">选择你的专属风格</text>
+				</view>
 
-			<!-- 经典简约主题卡片 -->
-			<view
-				:class="['theme-card', themeClass, { active: isNormal }]"
-				@tap="() => setTheme('normal')"
-			>
-				<view :class="['card-preview', 'preview-normal', themeClass]">
-					<view class="preview-bar"></view>
-					<view class="preview-body">
-						<view class="preview-block p1"></view>
-						<view class="preview-block p2"></view>
+				<!-- 经典简约 -->
+				<view
+					:class="['theme-card', themeClass, { active: isNormal }]"
+					@tap="onSelectTheme('normal')"
+				>
+					<view :class="['card-visual', themeClass]">
+						<view class="visual-bar"></view>
+						<view class="visual-body">
+							<view class="visual-block w80"></view>
+							<view class="visual-block w50"></view>
+						</view>
+					</view>
+					<view class="card-body">
+						<view class="card-title-row">
+							<text :class="['card-name', themeClass]">经典简约</text>
+							<view v-if="isNormal" :class="['check-icon', themeClass]">
+								<text class="check-text">✓</text>
+							</view>
+						</view>
+						<text :class="['card-desc', themeClass]">简洁明亮，专注内容</text>
 					</view>
 				</view>
-				<view class="card-info">
-					<text :class="['card-name', themeClass]">经典简约</text>
-					<text :class="['card-desc', themeClass]">清晰干净的界面风格，专注内容</text>
-				</view>
-				<view :class="['radio', themeClass, { checked: isNormal }]">
-					<view v-if="isNormal" class="radio-dot"></view>
-				</view>
-			</view>
 
-			<!-- 液体玻璃主题卡片 -->
-			<view
-				:class="['theme-card', themeClass, { active: isLiquidGlass }]"
-				@tap="() => setTheme('liquid-glass')"
-			>
-				<view :class="['card-preview', 'preview-glass', themeClass]">
-					<view class="preview-bar glass-bar"></view>
-					<view class="preview-body">
-						<view class="preview-block glass-p1"></view>
-						<view class="preview-block glass-p2"></view>
+				<!-- 液体玻璃 -->
+				<view
+					:class="['theme-card', themeClass, { active: isLiquidGlass }]"
+					@tap="onSelectTheme('liquid-glass')"
+				>
+					<view :class="['card-visual', 'visual-glass', themeClass]">
+						<view class="visual-bar glass-bar"></view>
+						<view class="visual-body">
+							<view class="visual-block glass-block w80"></view>
+							<view class="visual-block glass-block w50"></view>
+						</view>
+					</view>
+					<view class="card-body">
+						<view class="card-title-row">
+							<text :class="['card-name', themeClass]">液体玻璃</text>
+							<view v-if="isLiquidGlass" :class="['check-icon', themeClass]">
+								<text class="check-text">✓</text>
+							</view>
+						</view>
+						<text :class="['card-desc', themeClass]">深邃通透，质感优雅</text>
 					</view>
 				</view>
-				<view class="card-info">
-					<text :class="['card-name', themeClass]">液体玻璃</text>
-					<text :class="['card-desc', themeClass]">磨砂玻璃效果，轻盈通透的视觉体验</text>
-				</view>
-				<view :class="['radio', themeClass, { checked: isLiquidGlass }]">
-					<view v-if="isLiquidGlass" class="radio-dot"></view>
-				</view>
 			</view>
-		</view>
 
-		<!-- 关于 -->
-		<view :class="['section', themeClass]">
-			<text :class="['section-title', themeClass]">关于</text>
-			<view :class="['about-item', themeClass]">
-				<text :class="['about-label', themeClass]">应用名称</text>
-				<text :class="['about-value', themeClass]">E游周享</text>
+			<!-- 关于 -->
+			<view :class="['section', themeClass]">
+				<view class="section-header">
+					<text :class="['section-title', themeClass]">关于应用</text>
+				</view>
+
+				<view :class="['info-item', themeClass]">
+					<text :class="['info-label', themeClass]">应用名称</text>
+					<text :class="['info-value', themeClass]">E游周享</text>
+				</view>
+
+				<view :class="['info-item', themeClass]">
+					<text :class="['info-label', themeClass]">版本号</text>
+					<text :class="['info-value', themeClass]">1.0.0</text>
+				</view>
+
+				<view :class="['info-item', themeClass]">
+					<text :class="['info-label', themeClass]">数据来源</text>
+					<text :class="['info-value', themeClass]">60s.viki.moe</text>
+				</view>
+
+				<view :class="['info-item', themeClass, 'info-item-last']">
+					<text :class="['info-label', themeClass]">功能</text>
+					<text :class="['info-value', themeClass]">Epic 免费游戏资讯</text>
+				</view>
 			</view>
-			<view :class="['about-item', themeClass]">
-				<text :class="['about-label', themeClass]">版本</text>
-				<text :class="['about-value', themeClass]">1.0.0</text>
-			</view>
-			<view :class="['about-item', themeClass]">
-				<text :class="['about-label', themeClass]">数据来源</text>
-				<text :class="['about-value', themeClass]">60s.viki.moe</text>
-			</view>
-			<view :class="['about-item', themeClass]">
-				<text :class="['about-label', themeClass]">功能说明</text>
-				<text :class="['about-value', themeClass]">Epic 每周免费游戏资讯</text>
-			</view>
-		</view>
+
+			<!-- 底部安全区 -->
+			<view class="bottom-safe"></view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { useTheme } from '@/composables/useTheme'
+	import type { ThemeType } from '@/composables/useTheme'
 	import { computed } from 'vue'
 
 	const { currentTheme, isLiquidGlass, isNormal, setTheme } = useTheme()
@@ -90,6 +111,18 @@
 		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
 	})
 
+	/* ========== 主题切换 ========== */
+	function onSelectTheme(theme: ThemeType) {
+		if (currentTheme.value === theme) return
+		setTheme(theme)
+		uni.showToast({
+			title: theme === 'normal' ? '已切换为经典简约' : '已切换为液体玻璃',
+			icon: 'none',
+			duration: 1500,
+		})
+	}
+
+	/* ========== 返回 ========== */
 	function goBack() {
 		uni.navigateBack({})
 	}
@@ -101,13 +134,18 @@
 	/* ===================================== */
 
 	.settings-page {
-		min-height: 100vh;
+		height: 100vh;
+		flex-direction: column;
+	}
+
+	.settings-page.theme-normal {
 		background-color: #f2f2f7;
 	}
 
 	/* ---------- 头部 ---------- */
 	.header {
-		padding: 48px 20px 20px 20px;
+		flex-shrink: 0;
+		padding: 48px 20px 16px 20px;
 		background-color: #ffffff;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 	}
@@ -119,11 +157,15 @@
 	}
 
 	.back-btn {
+		width: 40px;
+		height: 40px;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.back-icon {
 		font-size: 22px;
 		color: #007aff;
-		padding: 8px;
-		width: 44px;
-		text-align: center;
 	}
 
 	.header-title {
@@ -133,7 +175,12 @@
 	}
 
 	.header-spacer {
-		width: 44px;
+		width: 40px;
+	}
+
+	/* ---------- 内容区 ---------- */
+	.content-scroll {
+		flex: 1;
 	}
 
 	/* ---------- 分区 ---------- */
@@ -142,158 +189,159 @@
 		padding: 20px 18px;
 		border-radius: 16px;
 		background-color: #ffffff;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.section-header {
+		margin-bottom: 16px;
 	}
 
 	.section-title {
 		font-size: 16px;
 		font-weight: 700;
 		color: #1c1c1e;
-		margin-bottom: 4px;
+		display: block;
 	}
 
 	.section-desc {
-		font-size: 13px;
+		font-size: 12px;
 		color: #8e8e93;
-		margin-bottom: 16px;
+		margin-top: 4px;
+		display: block;
 	}
 
 	/* ---------- 主题卡片 ---------- */
 	.theme-card {
 		flex-direction: row;
 		align-items: center;
-		padding: 14px;
+		padding: 12px;
 		border-radius: 14px;
-		background-color: #f9f9fb;
+		background-color: #f8f8fa;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
 	}
 
+	.theme-card:last-child {
+		margin-bottom: 0;
+	}
+
 	.theme-card.active {
 		border-color: #007aff;
-		background-color: #e8f2ff;
+		background-color: #f0f7ff;
 	}
 
-	.card-preview {
-		width: 56px;
-		height: 56px;
-		border-radius: 12px;
+	/* 卡片视觉预览 */
+	.card-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
 		overflow: hidden;
-		margin-right: 14px;
+		margin-right: 12px;
 		flex-shrink: 0;
-	}
-
-	.preview-normal {
 		background-color: #e8e8ed;
 	}
 
-	.preview-glass {
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+	.visual-glass {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
 	}
 
-	.preview-bar {
+	.visual-bar {
 		height: 10px;
 		background-color: #d1d1d6;
 	}
 
 	.glass-bar {
-		background: linear-gradient(135deg, rgba(180, 200, 255, 0.6), rgba(200, 180, 255, 0.4));
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
 	}
 
-	.preview-body {
+	.visual-body {
 		flex: 1;
 		padding: 6px;
 		flex-direction: column;
 		justify-content: space-around;
 	}
 
-	.preview-block {
-		height: 8px;
+	.visual-block {
+		height: 7px;
 		border-radius: 3px;
+		background-color: #c7c7cc;
 	}
 
-	.p1 {
-		background-color: #d1d1d6;
+	.visual-block.w80 {
 		width: 80%;
 	}
 
-	.p2 {
-		background-color: #e5e5ea;
+	.visual-block.w50 {
 		width: 50%;
 	}
 
-	.glass-p1 {
-		background: linear-gradient(135deg, rgba(161, 188, 255, 0.7), rgba(176, 159, 255, 0.5));
-		width: 80%;
+	.glass-block {
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
 	}
 
-	.glass-p2 {
-		background: linear-gradient(135deg, rgba(201, 176, 255, 0.5), rgba(161, 212, 255, 0.4));
-		width: 50%;
-	}
-
-	.card-info {
+	/* 卡片内容 */
+	.card-body {
 		flex: 1;
 		flex-direction: column;
+	}
+
+	.card-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	.card-name {
 		font-size: 15px;
 		font-weight: 600;
 		color: #1c1c1e;
-		margin-bottom: 2px;
+	}
+
+	.check-icon {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		background-color: #007aff;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.check-text {
+		font-size: 12px;
+		color: #ffffff;
+		font-weight: 700;
 	}
 
 	.card-desc {
 		font-size: 12px;
 		color: #8e8e93;
-		line-height: 1.3;
+		margin-top: 4px;
 	}
 
-	/* ---------- 单选按钮 ---------- */
-	.radio {
-		width: 22px;
-		height: 22px;
-		border-radius: 11px;
-		border: 2px solid #d1d1d6;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.radio.checked {
-		border-color: #007aff;
-		background-color: #007aff;
-	}
-
-	.radio-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 4px;
-		background-color: #ffffff;
-	}
-
-	/* ---------- 关于列表 ---------- */
-	.about-item {
+	/* ---------- 信息列表 ---------- */
+	.info-item {
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		padding: 12px 4px;
+		padding: 14px 0;
 	}
 
-	.about-item + .about-item {
+	.info-item + .info-item {
 		border-top: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
-	.about-label {
+	.info-label {
 		font-size: 15px;
 		color: #1c1c1e;
 	}
 
-	.about-value {
+	.info-value {
 		font-size: 15px;
 		color: #8e8e93;
+	}
+
+	/* ---------- 底部 ---------- */
+	.bottom-safe {
+		height: 34px;
 	}
 
 	/* ===================================== */
@@ -309,8 +357,8 @@
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.back-btn.theme-glass {
-		color: rgba(180, 200, 255, 0.9);
+	.back-icon.theme-glass {
+		color: rgba(160, 200, 255, 0.9);
 	}
 
 	.header-title.theme-glass {
@@ -320,7 +368,6 @@
 	.section.theme-glass {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 	}
 
 	.section-title.theme-glass {
@@ -328,7 +375,7 @@
 	}
 
 	.section-desc.theme-glass {
-		color: rgba(200, 210, 240, 0.6);
+		color: rgba(190, 205, 235, 0.5);
 	}
 
 	.theme-card.theme-glass {
@@ -337,38 +384,35 @@
 	}
 
 	.theme-card.theme-glass.active {
-		background: rgba(120, 150, 255, 0.1);
+		background: rgba(100, 140, 255, 0.12);
 		border-color: rgba(140, 170, 255, 0.4);
-		box-shadow: 0 0 20px rgba(100, 140, 255, 0.15);
+	}
+
+	.card-visual.theme-glass {
+		background: rgba(255, 255, 255, 0.06);
 	}
 
 	.card-name.theme-glass {
-		color: rgba(240, 245, 255, 0.9);
+		color: rgba(235, 240, 255, 0.9);
+	}
+
+	.check-icon.theme-glass {
+		background: rgba(120, 160, 255, 0.8);
 	}
 
 	.card-desc.theme-glass {
-		color: rgba(190, 205, 235, 0.55);
+		color: rgba(180, 195, 225, 0.5);
 	}
 
-	.radio.theme-glass {
-		border-color: rgba(255, 255, 255, 0.15);
-	}
-
-	.radio.theme-glass.checked {
-		border-color: rgba(120, 160, 255, 0.8);
-		background-color: rgba(120, 160, 255, 0.8);
-		box-shadow: 0 0 12px rgba(120, 160, 255, 0.4);
-	}
-
-	.about-item.theme-glass + .about-item.theme-glass {
+	.info-item.theme-glass + .info-item.theme-glass {
 		border-top: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
-	.about-label.theme-glass {
+	.info-label.theme-glass {
 		color: rgba(235, 240, 255, 0.85);
 	}
 
-	.about-value.theme-glass {
+	.info-value.theme-glass {
 		color: rgba(190, 205, 235, 0.5);
 	}
 </style>

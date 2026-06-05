@@ -1,6 +1,8 @@
 /**
  * Epic Games 免费游戏 API 服务
  * 数据来源: https://60s.viki.moe/v2/epic
+ *
+ * 功能: 类型定义 | 请求封装 | 缓存机制 | 工具函数
  */
 
 /* ========== 类型定义 ========== */
@@ -39,13 +41,45 @@ interface RequestOptions {
 	timeout?: number
 }
 
+interface CacheEntry<T> {
+	data: T
+	timestamp: number
+}
+
 /* ========== 常量 ========== */
 
 const API_BASE = 'https://60s.viki.moe/v2'
 const EPIC_ENDPOINT = `${API_BASE}/epic`
 const REQUEST_TIMEOUT = 15000
+const CACHE_DURATION = 5 * 60 * 1000 // 5 分钟缓存
 
-/* ========== 核心请求函数 ========== */
+/* ========== 缓存管理 ========== */
+
+const cache: Record<string, CacheEntry<any>> = {}
+
+function getCache<T>(key: string): T | null {
+	const entry = cache[key]
+	if (!entry) return null
+	const now = Date.now()
+	if (now - entry.timestamp > CACHE_DURATION) {
+		delete cache[key]
+		return null
+	}
+	return entry.data as T
+}
+
+function setCache<T>(key: string, data: T): void {
+	cache[key] = {
+		data,
+		timestamp: Date.now(),
+	}
+}
+
+function clearCache(): void {
+	Object.keys(cache).forEach((k) => delete cache[k])
+}
+
+/* ========== 请求封装 ========== */
 
 function request<T>(url: string, options: RequestOptions = {}): Promise<ApiResult<T>> {
 	return new Promise((resolve) => {
@@ -55,7 +89,7 @@ function request<T>(url: string, options: RequestOptions = {}): Promise<ApiResul
 			timeout: options.timeout ?? REQUEST_TIMEOUT,
 			success: (res) => {
 				const statusCode = res.statusCode
-				if (statusCode === 200) {
+				if (statusCode === 200 && res.data) {
 					resolve({
 						success: true,
 						data: res.data as T,
@@ -72,25 +106,77 @@ function request<T>(url: string, options: RequestOptions = {}): Promise<ApiResul
 				}
 			},
 			fail: (err) => {
-				resolve({
-					success: false,
-					data: null,
-					error: err.errMsg ?? '网络请求失败',
-					message: '网络连接异常，请检查网络后重试',
-				})
+				const msg = err.errMsg ?? ''
+				if (msg.includes('abort')) {
+					resolve({
+						success: false,
+						data: null,
+						error: 'REQUEST_ABORT',
+						message: '请求已取消',
+					})
+				} else {
+					resolve({
+						success: false,
+						data: null,
+						error: msg || '网络请求失败',
+						message: '网络连接异常，请检查网络后重试',
+					})
+				}
 			},
 		})
 	})
 }
 
+/* ========== 唯一请求标识 ========== */
+
+let currentRequestId = 0
+function nextRequestId(): number {
+	return ++currentRequestId
+}
+
 /* ========== Epic Games API ========== */
 
 /**
- * 获取 Epic Games 免费游戏列表
+ * 获取 Epic Games 免费游戏列表（带缓存）
+ * @param forceRefresh 强制刷新，忽略缓存
  */
-export function fetchEpicGames(): Promise<ApiResult<EpicResponse>> {
-	return request<EpicResponse>(EPIC_ENDPOINT)
+export function fetchEpicGames(forceRefresh: boolean = false): Promise<ApiResult<EpicResponse>> {
+	return new Promise((resolve) => {
+		const requestId = nextRequestId()
+
+		// 检查缓存（除非强制刷新）
+		if (!forceRefresh) {
+			const cached = getCache<EpicResponse>(EPIC_ENDPOINT)
+			if (cached) {
+				resolve({
+					success: true,
+					data: cached,
+					error: null,
+					message: 'ok (cached)',
+				})
+				return
+			}
+		}
+
+		// 发送请求
+		request<EpicResponse>(EPIC_ENDPOINT).then((result) => {
+			// 只有最新请求的结果才更新缓存
+			if (requestId === currentRequestId && result.success && result.data) {
+				setCache(EPIC_ENDPOINT, result.data)
+			}
+			resolve(result)
+		})
+	})
 }
+
+/**
+ * 取消当前请求
+ */
+export function cancelCurrentRequest(): void {
+	currentRequestId++
+}
+
+/* ========== 数据筛选工具 ========== */
 
 /**
  * 筛选当前可免费领取的游戏
@@ -106,8 +192,10 @@ export function getUpcomingGames(games: EpicGame[]): EpicGame[] {
 	return games.filter((g) => !g.is_free_now)
 }
 
+/* ========== 日期格式化工具 ========== */
+
 /**
- * 格式化日期字符串 (YYYY/MM/DD → YYYY-MM-DD)
+ * 格式化日期字符串 (YYYY/MM/DD HH:mm:ss → YYYY-MM-DD)
  */
 export function formatFreeTime(dateStr: string): string {
 	if (!dateStr) return ''
@@ -138,3 +226,7 @@ export function formatRemainingTime(freeEndAt: number): string {
 	const days = Math.floor(hours / 24)
 	return `剩余 ${days} 天`
 }
+
+/* ========== 缓存控制 ========== */
+
+export { clearCache }

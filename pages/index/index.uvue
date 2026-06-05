@@ -6,11 +6,14 @@
 			<view :class="['navbar', themeClass]">
 				<view class="navbar-left">
 					<text :class="['greeting', themeClass]">E游周享</text>
-					<text :class="['subtitle', themeClass]">Epic 每周免费游戏资讯</text>
+					<text :class="['subtitle', themeClass]">Epic 每周免费游戏</text>
 				</view>
 				<view class="navbar-right">
-					<view :class="['icon-btn', themeClass]" @tap="refreshData">
-						<text :class="['icon-text', themeClass]">↻</text>
+					<view
+						:class="['icon-btn', themeClass, { loading: isRefreshing }]"
+						@tap="onRefreshTap"
+					>
+						<text :class="['icon-text', themeClass]">{{ isRefreshing ? '⟳' : '↻' }}</text>
 					</view>
 					<view :class="['icon-btn', themeClass]" @tap="goSettings">
 						<text :class="['icon-text', themeClass]">⚙</text>
@@ -19,107 +22,152 @@
 			</view>
 		</view>
 
-		<!-- 加载状态 -->
-		<view v-if="loading" :class="['loading-wrap', themeClass]">
-			<text :class="['loading-text', themeClass]">正在加载...</text>
-		</view>
-
-		<!-- 错误状态 -->
-		<view v-else-if="hasError" :class="['error-wrap', themeClass]">
-			<text class="error-emoji">😵</text>
-			<text :class="['error-text', themeClass]">{{ errorMsg }}</text>
-			<view :class="['retry-btn', themeClass]" @tap="refreshData">
-				<text :class="['retry-text', themeClass]">点击重试</text>
-			</view>
-		</view>
-
-		<!-- 数据内容 -->
-		<view v-else class="content-wrap">
-			<!-- 本周免费游戏 -->
-			<view v-if="freeNowGames.length > 0">
-				<view class="section-header">
-					<text :class="['section-label', themeClass]">本周免费</text>
-					<text :class="['section-badge', themeClass]">限时领取</text>
+		<!-- 页面内容区 -->
+		<scroll-view
+			scroll-y="true"
+			class="content-scroll"
+			:refresher-enabled="true"
+			:refresher-triggered="isRefreshing"
+			@refresherrefresh="onPullRefresh"
+			@scrolltolower="onScrollBottom"
+		>
+			<!-- 骨架屏加载态 -->
+			<view v-if="isSkeleton" class="skeleton-wrap">
+				<view class="skeleton-section">
+					<view class="skeleton-header"></view>
+					<scroll-view scroll-x="true" class="skeleton-scroll">
+						<view class="skeleton-card-list">
+							<view class="skeleton-card" v-for="i in 3" :key="i">
+								<view class="skeleton-img"></view>
+								<view class="skeleton-text"></view>
+								<view class="skeleton-text short"></view>
+							</view>
+						</view>
+					</scroll-view>
 				</view>
-
-				<scroll-view scroll-x="true" class="card-scroll" show-scrollbar="false">
-					<view class="card-scroll-inner">
-						<view
-							:class="['game-card', themeClass]"
-							v-for="game in freeNowGames"
-							:key="game.id"
-							@tap="() => openGameLink(game.link)"
-						>
-							<image
-								:class="['game-cover', themeClass]"
-								:src="game.cover"
-								mode="aspectFill"
-							/>
-							<view class="game-info">
-								<text :class="['game-title', themeClass]">{{ game.title }}</text>
-								<text :class="['game-desc', themeClass]">{{ game.description }}</text>
-								<view :class="['game-meta', themeClass]">
-									<text :class="['game-tag-free', themeClass]">免费</text>
-									<text :class="['game-time', themeClass]">
-										截止 {{ formatFreeTime(game.free_end) }}
-									</text>
-								</view>
+				<view class="skeleton-section">
+					<view class="skeleton-header"></view>
+					<view class="skeleton-list">
+						<view class="skeleton-list-item" v-for="i in 4" :key="i">
+							<view class="skeleton-thumb"></view>
+							<view class="skeleton-content">
+								<view class="skeleton-text"></view>
+								<view class="skeleton-text short"></view>
 							</view>
 						</view>
 					</view>
-				</scroll-view>
+				</view>
 			</view>
 
-			<!-- 即将推出 -->
-			<view v-if="upcomingGames.length > 0">
-				<view class="section-header">
-					<text :class="['section-label', themeClass]">即将推出</text>
-					<text :class="['section-badge-outline', themeClass]">敬请期待</text>
+			<!-- 错误态 -->
+			<view v-else-if="hasError" :class="['state-wrap', themeClass]">
+				<text class="state-emoji">😵</text>
+				<text :class="['state-text', themeClass]">{{ errorMsg }}</text>
+				<view :class="['state-btn', themeClass]" @tap="loadGames">
+					<text :class="['state-btn-text', themeClass]">重新加载</text>
 				</view>
+			</view>
 
-				<view :class="['list-item', themeClass]" v-for="game in upcomingGames" :key="game.id">
-					<image
-						:class="['list-cover', themeClass]"
-						:src="game.cover"
-						mode="aspectFill"
-					/>
-					<view class="list-content">
-						<text :class="['list-title', themeClass]">{{ game.title }}</text>
-						<text :class="['list-desc', themeClass]">{{ game.description }}</text>
-						<view class="list-meta">
-							<text :class="['meta-text', themeClass]">
-								{{ formatFreeTime(game.free_start) }} 起
-							</text>
+			<!-- 空数据态 -->
+			<view v-else-if="isEmpty" :class="['state-wrap', themeClass]">
+				<text class="state-emoji">📭</text>
+				<text :class="['state-text', themeClass]">本周暂无免费游戏</text>
+				<text :class="['state-sub', themeClass]">下周再来看看吧</text>
+			</view>
+
+			<!-- 数据内容 -->
+			<view v-else class="data-wrap">
+				<!-- 本周免费 -->
+				<view v-if="freeNowGames.length > 0">
+					<view class="section-header">
+						<view class="section-title-row">
+							<text :class="['section-label', themeClass]">本周免费</text>
+							<text :class="['section-badge', themeClass]">限时</text>
 						</view>
 					</view>
-					<view :class="['list-badge', themeClass]">
-						<text :class="['badge-text', themeClass]">预告</text>
+
+					<scroll-view scroll-x="true" class="card-scroll" enhanced="true" bounces="false">
+						<view class="card-list">
+							<view
+								:class="['game-card', themeClass]"
+								v-for="game in freeNowGames"
+								:key="game.id"
+								@tap="openGameLink(game)"
+							>
+								<view class="game-cover-wrap">
+									<image
+										:class="['game-cover', themeClass]"
+										:src="game.cover"
+										mode="aspectFill"
+										lazy-load="true"
+										@error="onImageError"
+									/>
+									<view :class="['free-tag', themeClass]">免费</view>
+								</view>
+								<view class="game-body">
+									<text :class="['game-title', themeClass]">{{ game.title }}</text>
+									<text :class="['game-desc', themeClass]">{{ game.seller }}</text>
+									<view class="game-footer">
+										<text :class="['game-time', themeClass]">
+											截止 {{ formatDate(game.free_end) }}
+										</text>
+									</view>
+								</view>
+							</view>
+						</view>
+					</scroll-view>
+				</view>
+
+				<!-- 即将推出 -->
+				<view v-if="upcomingGames.length > 0">
+					<view class="section-header">
+						<view class="section-title-row">
+							<text :class="['section-label', themeClass]">下周预告</text>
+							<text :class="['section-badge-outline', themeClass]">敬请期待</text>
+						</view>
 					</view>
+
+					<view class="upcoming-list">
+						<view
+							:class="['upcoming-item', themeClass]"
+							v-for="game in upcomingGames"
+							:key="game.id"
+							@tap="openGameLink(game)"
+						>
+							<image
+								:class="['upcoming-thumb', themeClass]"
+								:src="game.cover"
+								mode="aspectFill"
+								lazy-load="true"
+								@error="onImageError"
+							/>
+							<view class="upcoming-content">
+								<text :class="['upcoming-title', themeClass]">{{ game.title }}</text>
+								<text :class="['upcoming-seller', themeClass]">{{ game.seller }}</text>
+								<text :class="['upcoming-date', themeClass]">
+									{{ formatDate(game.free_start) }} 起免费
+								</text>
+							</view>
+							<text :class="['upcoming-arrow', themeClass]">›</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 底部提示 -->
+				<view :class="['footer-tip', themeClass]">
+					<text :class="['tip-text', themeClass]">数据来源: 60s.viki.moe</text>
 				</view>
 			</view>
 
-			<!-- 空数据 -->
-			<view v-if="freeNowGames.length === 0 && upcomingGames.length === 0" :class="['empty-wrap', themeClass]">
-				<text class="empty-emoji">📭</text>
-				<text :class="['empty-text', themeClass]">暂无游戏数据</text>
-			</view>
-
-			<!-- 底部提示 -->
-			<view :class="['footer-tip', themeClass]">
-				<text :class="['tip-text', themeClass]">
-					数据来源: 60s.viki.moe · 点击卡片前往 Epic 商店领取
-				</text>
-			</view>
-		</view>
-
-		<!-- 底部安全区 -->
-		<view class="bottom-safe"></view>
+			<!-- 底部安全区 -->
+			<view class="bottom-safe"></view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { useTheme } from '@/composables/useTheme'
-	import { fetchEpicGames, getFreeNowGames, getUpcomingGames, formatFreeTime } from '@/api/epic'
+	import { fetchEpicGames, getFreeNowGames, getUpcomingGames } from '@/api/epic'
 	import type { EpicGame } from '@/api/epic'
 	import { ref, computed } from 'vue'
 
@@ -129,56 +177,121 @@
 		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
 	})
 
-	/* ========== 数据状态 ========== */
-	const loading = ref(true)
+	/* ========== 状态 ========== */
+	const isSkeleton = ref(true) // 骨架屏初始开启
+	const isRefreshing = ref(false)
 	const errorMsg = ref<string | null>(null)
 	const freeNowGames = ref<EpicGame[]>([])
 	const upcomingGames = ref<EpicGame[]>([])
 
 	const hasError = computed(() => errorMsg.value !== null)
+	const isEmpty = computed(() => !isSkeleton.value && !hasError.value && freeNowGames.value.length === 0 && upcomingGames.value.length === 0)
 
 	/* ========== 数据加载 ========== */
-	async function loadGames() {
-		loading.value = true
+	async function loadGames(forceRefresh: boolean = false) {
 		errorMsg.value = null
 
-		const result = await fetchEpicGames()
-		if (result.success && result.data != null) {
+		const result = await fetchEpicGames(forceRefresh)
+		if (result.success && result.data) {
 			freeNowGames.value = getFreeNowGames(result.data.data)
 			upcomingGames.value = getUpcomingGames(result.data.data)
 		} else {
 			errorMsg.value = result.message
 		}
-		loading.value = false
+		isSkeleton.value = false
+		isRefreshing.value = false
 	}
 
-	function refreshData() {
-		loadGames()
+	/* ========== 下拉刷新 ========== */
+	function onPullRefresh() {
+		if (isRefreshing.value) return
+		isRefreshing.value = true
+		loadGames(true)
 	}
 
-	/* ========== 交互 ========== */
-	function openGameLink(link: string) {
-		if (!link || link.includes('[]')) {
+	/* ========== 刷新按钮点击（防抖）========== */
+	let refreshTimer: number | null = null
+	function onRefreshTap() {
+		if (isRefreshing.value) return
+		if (refreshTimer !== null) {
+			clearTimeout(refreshTimer)
+			refreshTimer = null
+			return
+		}
+		isRefreshing.value = true
+		loadGames(true)
+		refreshTimer = setTimeout(() => {
+			refreshTimer = null
+		}, 1000)
+	}
+
+	/* ========== 滚动到底部 ========== */
+	function onScrollBottom() {
+		// 预留扩展：加载更多
+	}
+
+	/* ========== 图片加载失败 ========== */
+	function onImageError(e: any) {
+		console.log('Image load error:', e)
+	}
+
+	/* ========== 打开游戏链接 ========== */
+	function openGameLink(game: EpicGame) {
+		if (!game.link || game.link.includes('[]')) {
 			uni.showToast({
-				title: '暂未公布，敬请期待',
+				title: '游戏链接暂未公布',
 				icon: 'none',
+				duration: 2000,
 			})
 			return
 		}
 		uni.showToast({
-			title: '即将跳转至 Epic 商店',
-			icon: 'none',
+			title: '正在打开 Epic 商店...',
+			icon: 'loading',
+			duration: 1500,
 		})
+		setTimeout(() => {
+			// #ifdef H5
+			window.open(game.link, '_blank')
+			// #endif
+			// #ifndef H5
+			uni.setClipboardData({
+				data: game.link,
+				showToast: true,
+				toastTitle: '链接已复制，请在浏览器中打开',
+			})
+			// #endif
+		}, 800)
 	}
 
+	/* ========== 跳转设置 ========== */
 	function goSettings() {
 		uni.navigateTo({
 			url: '/pages/settings/settings',
 		})
 	}
 
-	/* ========== 初始化 ========== */
-	loadGames()
+	/* ========== 日期格式化 ========== */
+	function formatDate(dateStr: string): string {
+		if (!dateStr) return ''
+		const parts = dateStr.split(' ')
+		if (parts.length > 0) {
+			return parts[0].replace(/\//g, '-')
+		}
+		return dateStr
+	}
+
+	/* ========== 生命周期 ========== */
+	onMounted(() => {
+		loadGames()
+	})
+
+	onUnmounted(() => {
+		if (refreshTimer !== null) {
+			clearTimeout(refreshTimer)
+			refreshTimer = null
+		}
+	})
 </script>
 
 <style>
@@ -187,7 +300,8 @@
 	/* ===================================== */
 
 	.home-page {
-		min-height: 100vh;
+		height: 100vh;
+		flex-direction: column;
 	}
 
 	.home-page.theme-normal {
@@ -196,6 +310,7 @@
 
 	/* ---------- 导航栏 ---------- */
 	.navbar-wrap {
+		flex-shrink: 0;
 		background-color: #ffffff;
 	}
 
@@ -208,7 +323,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		padding: 16px 20px 20px 20px;
+		padding: 12px 20px 16px 20px;
 		background-color: #ffffff;
 	}
 
@@ -216,104 +331,167 @@
 		flex-direction: column;
 	}
 
-	.navbar-right {
-		flex-direction: row;
-		gap: 10px;
-	}
-
 	.greeting {
-		font-size: 24px;
+		font-size: 22px;
 		font-weight: 800;
 		color: #1c1c1e;
-		letter-spacing: -0.5px;
-		lines: 1;
 	}
 
 	.subtitle {
-		font-size: 14px;
+		font-size: 13px;
 		color: #8e8e93;
 		margin-top: 2px;
-		lines: 1;
+	}
+
+	.navbar-right {
+		flex-direction: row;
+		align-items: center;
 	}
 
 	.icon-btn {
-		width: 42px;
-		height: 42px;
-		border-radius: 14px;
+		width: 40px;
+		height: 40px;
+		border-radius: 12px;
 		background-color: #f2f2f7;
 		align-items: center;
 		justify-content: center;
+		margin-left: 8px;
+	}
+
+	.icon-btn.loading {
+		background-color: #e8f2ff;
 	}
 
 	.icon-text {
-		font-size: 20px;
+		font-size: 18px;
+		color: #007aff;
 	}
 
-	/* ---------- 加载状态 ---------- */
-	.loading-wrap {
-		padding: 120px 20px;
+	/* ---------- 内容滚动区 ---------- */
+	.content-scroll {
+		flex: 1;
+	}
+
+	/* ---------- 骨架屏 ---------- */
+	.skeleton-wrap {
+		padding: 0 4px;
+	}
+
+	.skeleton-section {
+		margin-top: 16px;
+	}
+
+	.skeleton-header {
+		height: 20px;
+		width: 100px;
+		background-color: #e8e8ed;
+		margin: 20px 20px 12px 20px;
+	}
+
+	.skeleton-scroll {
+		width: 100%;
+	}
+
+	.skeleton-card-list {
+		flex-direction: row;
+		padding-left: 20px;
+	}
+
+	.skeleton-card {
+		width: 200px;
+		margin-right: 12px;
+		background-color: #ffffff;
+		border-radius: 16px;
+		overflow: hidden;
+		flex-shrink: 0;
+	}
+
+	.skeleton-img {
+		height: 112px;
+		background-color: #e8e8ed;
+	}
+
+	.skeleton-text {
+		height: 12px;
+		background-color: #e8e8ed;
+		margin: 12px 14px 6px 14px;
+	}
+
+	.skeleton-text.short {
+		width: 60%;
+		margin-top: 4px;
+	}
+
+	.skeleton-list {
+		padding: 0 16px;
+	}
+
+	.skeleton-list-item {
+		flex-direction: row;
 		align-items: center;
-		justify-content: center;
+		padding: 12px 0;
 	}
 
-	.loading-text {
-		font-size: 15px;
-		color: #8e8e93;
+	.skeleton-thumb {
+		width: 60px;
+		height: 36px;
+		background-color: #e8e8ed;
+		border-radius: 6px;
+		margin-right: 12px;
 	}
 
-	/* ---------- 错误状态 ---------- */
-	.error-wrap {
-		padding: 80px 40px;
+	.skeleton-content {
+		flex: 1;
+	}
+
+	/* ---------- 状态页 ---------- */
+	.state-wrap {
+		padding: 100px 40px 60px 40px;
 		align-items: center;
 	}
 
-	.error-emoji {
-		font-size: 48px;
-		margin-bottom: 12px;
-	}
-
-	.error-text {
-		font-size: 14px;
-		color: #8e8e93;
-		text-align: center;
-		line-height: 1.5;
+	.state-emoji {
+		font-size: 56px;
 		margin-bottom: 16px;
 	}
 
-	.retry-btn {
-		padding: 10px 28px;
+	.state-text {
+		font-size: 15px;
+		color: #8e8e93;
+		text-align: center;
+	}
+
+	.state-sub {
+		font-size: 13px;
+		color: #c7c7cc;
+		margin-top: 8px;
+	}
+
+	.state-btn {
+		margin-top: 24px;
+		padding: 12px 32px;
 		border-radius: 12px;
 		background-color: #007aff;
 	}
 
-	.retry-text {
+	.state-btn-text {
 		font-size: 14px;
 		color: #ffffff;
 		font-weight: 600;
 	}
 
-	/* ---------- 空数据状态 ---------- */
-	.empty-wrap {
-		padding: 60px 20px;
-		align-items: center;
+	/* ---------- 数据内容 ---------- */
+	.data-wrap {
+		padding-bottom: 10px;
 	}
 
-	.empty-emoji {
-		font-size: 40px;
-		margin-bottom: 8px;
-	}
-
-	.empty-text {
-		font-size: 14px;
-		color: #8e8e93;
-	}
-
-	/* ---------- 区域标题 ---------- */
 	.section-header {
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
 		padding: 20px 20px 12px 20px;
+	}
+
+	.section-title-row {
+		flex-direction: row;
+		align-items: center;
 	}
 
 	.section-label {
@@ -323,160 +501,148 @@
 	}
 
 	.section-badge {
-		font-size: 11px;
+		font-size: 10px;
 		color: #ffffff;
 		background-color: #ff3b30;
-		padding: 3px 10px;
-		border-radius: 6px;
+		padding: 2px 8px;
+		border-radius: 4px;
 		font-weight: 600;
+		margin-left: 8px;
 	}
 
 	.section-badge-outline {
-		font-size: 11px;
+		font-size: 10px;
 		color: #007aff;
 		background-color: #e8f2ff;
-		padding: 3px 10px;
-		border-radius: 6px;
+		padding: 2px 8px;
+		border-radius: 4px;
 		font-weight: 600;
+		margin-left: 8px;
 	}
 
-	.content-wrap {
-		padding-bottom: 20px;
-	}
-
-	/* ---------- 横向滚动卡片 ---------- */
+	/* ---------- 游戏卡片（横向滚动）---------- */
 	.card-scroll {
 		width: 100%;
 	}
 
-	.card-scroll-inner {
+	.card-list {
 		flex-direction: row;
 		padding-left: 20px;
-		padding-right: 8px;
+		padding-right: 12px;
 	}
 
 	.game-card {
-		width: 220px;
+		width: 200px;
 		flex-direction: column;
 		margin-right: 12px;
-		border-radius: 18px;
+		border-radius: 16px;
 		background-color: #ffffff;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 		border: 1px solid rgba(0, 0, 0, 0.06);
 		overflow: hidden;
 		flex-shrink: 0;
 	}
 
+	.game-cover-wrap {
+		position: relative;
+	}
+
 	.game-cover {
-		width: 220px;
-		height: 124px;
+		width: 200px;
+		height: 112px;
 		background-color: #e8e8ed;
 	}
 
-	.game-info {
+	.free-tag {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		font-size: 10px;
+		color: #ffffff;
+		background-color: #34c759;
+		padding: 2px 8px;
+		border-radius: 4px;
+		font-weight: 600;
+	}
+
+	.game-body {
 		padding: 12px 14px 14px 14px;
-		flex-direction: column;
 	}
 
 	.game-title {
-		font-size: 15px;
+		font-size: 14px;
 		font-weight: 700;
 		color: #1c1c1e;
 		lines: 1;
 	}
 
 	.game-desc {
-		font-size: 12px;
+		font-size: 11px;
 		color: #8e8e93;
 		margin-top: 4px;
 		lines: 1;
 	}
 
-	.game-meta {
-		flex-direction: row;
-		align-items: center;
-		gap: 8px;
-		margin-top: 10px;
-	}
-
-	.game-tag-free {
-		font-size: 11px;
-		color: #ffffff;
-		background-color: #34c759;
-		padding: 2px 8px;
-		border-radius: 6px;
-		font-weight: 600;
+	.game-footer {
+		margin-top: 8px;
 	}
 
 	.game-time {
 		font-size: 11px;
 		color: #b0b0b8;
-		lines: 1;
 	}
 
 	/* ---------- 即将推出列表 ---------- */
-	.list-item {
+	.upcoming-list {
+		padding: 0 16px;
+	}
+
+	.upcoming-item {
 		flex-direction: row;
 		align-items: center;
-		padding: 12px 20px;
-		margin: 0 16px 10px 16px;
-		border-radius: 16px;
+		padding: 12px 14px;
+		margin-bottom: 10px;
+		border-radius: 14px;
 		background-color: #ffffff;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 		border: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
-	.list-cover {
-		width: 64px;
-		height: 40px;
+	.upcoming-thumb {
+		width: 56px;
+		height: 36px;
 		border-radius: 6px;
 		background-color: #e8e8ed;
-		margin-right: 14px;
+		margin-right: 12px;
 		flex-shrink: 0;
 	}
 
-	.list-content {
+	.upcoming-content {
 		flex: 1;
-		flex-direction: column;
 	}
 
-	.list-title {
-		font-size: 15px;
+	.upcoming-title {
+		font-size: 14px;
 		font-weight: 700;
 		color: #1c1c1e;
 		lines: 1;
 	}
 
-	.list-desc {
-		font-size: 12px;
+	.upcoming-seller {
+		font-size: 11px;
 		color: #8e8e93;
-		margin-top: 3px;
+		margin-top: 2px;
 		lines: 1;
 	}
 
-	.list-meta {
-		flex-direction: row;
-		gap: 8px;
+	.upcoming-date {
+		font-size: 11px;
+		color: #b0b0b8;
 		margin-top: 4px;
 	}
 
-	.meta-text {
-		font-size: 11px;
-		color: #b0b0b8;
-	}
-
-	.list-badge {
-		padding: 3px 10px;
-		border-radius: 6px;
-		background-color: #f2f2f7;
+	.upcoming-arrow {
+		font-size: 20px;
+		color: #d1d1d6;
 		margin-left: 8px;
-		flex-shrink: 0;
-	}
-
-	.badge-text {
-		font-size: 11px;
-		color: #8e8e93;
-		font-weight: 500;
 	}
 
 	/* ---------- 底部 ---------- */
@@ -488,7 +654,6 @@
 	.tip-text {
 		font-size: 11px;
 		color: #c7c7cc;
-		text-align: center;
 	}
 
 	.bottom-safe {
@@ -503,7 +668,6 @@
 		background: linear-gradient(160deg, #0a0a1a 0%, #1a1030 25%, #0d1b2a 50%, #0f0f24 75%, #0a0a1a 100%);
 	}
 
-	/* 导航栏 */
 	.navbar-wrap.theme-glass {
 		background: rgba(255, 255, 255, 0.03);
 	}
@@ -522,7 +686,7 @@
 	}
 
 	.subtitle.theme-glass {
-		color: rgba(190, 205, 235, 0.55);
+		color: rgba(190, 205, 235, 0.5);
 	}
 
 	.icon-btn.theme-glass {
@@ -530,26 +694,31 @@
 		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	/* 加载 */
-	.loading-text.theme-glass {
-		color: rgba(200, 210, 240, 0.5);
+	.icon-btn.loading.theme-glass {
+		background: rgba(120, 150, 255, 0.1);
 	}
 
-	/* 错误 */
-	.error-text.theme-glass {
-		color: rgba(200, 210, 240, 0.5);
+	.icon-text.theme-glass {
+		color: rgba(160, 200, 255, 0.9);
 	}
 
-	.retry-btn.theme-glass {
+	.state-text.theme-glass {
+		color: rgba(200, 210, 240, 0.6);
+	}
+
+	.state-sub.theme-glass {
+		color: rgba(160, 180, 210, 0.4);
+	}
+
+	.state-btn.theme-glass {
 		background: rgba(120, 160, 255, 0.25);
 		border: 1px solid rgba(120, 160, 255, 0.2);
 	}
 
-	.retry-text.theme-glass {
+	.state-btn-text.theme-glass {
 		color: rgba(180, 210, 255, 0.9);
 	}
 
-	/* 区域标题 */
 	.section-label.theme-glass {
 		color: rgba(240, 245, 255, 0.88);
 	}
@@ -563,11 +732,15 @@
 	.game-card.theme-glass {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.07);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 	}
 
 	.game-cover.theme-glass {
 		background-color: rgba(255, 255, 255, 0.03);
+	}
+
+	.free-tag.theme-glass {
+		background: rgba(52, 199, 89, 0.35);
+		color: rgba(150, 255, 180, 0.95);
 	}
 
 	.game-title.theme-glass {
@@ -578,52 +751,37 @@
 		color: rgba(180, 195, 225, 0.5);
 	}
 
-	.game-tag-free.theme-glass {
-		background: rgba(52, 199, 89, 0.3);
-		color: rgba(130, 255, 160, 0.9);
-	}
-
 	.game-time.theme-glass {
 		color: rgba(160, 175, 210, 0.4);
 	}
 
-	/* 列表 */
-	.list-item.theme-glass {
+	/* 即将推出 */
+	.upcoming-item.theme-glass {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.06);
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 	}
 
-	.list-cover.theme-glass {
+	.upcoming-thumb.theme-glass {
 		background-color: rgba(255, 255, 255, 0.03);
 	}
 
-	.list-title.theme-glass {
+	.upcoming-title.theme-glass {
 		color: rgba(235, 240, 255, 0.9);
 	}
 
-	.list-desc.theme-glass {
+	.upcoming-seller.theme-glass {
 		color: rgba(180, 195, 225, 0.5);
 	}
 
-	.meta-text.theme-glass {
+	.upcoming-date.theme-glass {
 		color: rgba(160, 175, 210, 0.4);
 	}
 
-	.list-badge.theme-glass {
-		background: rgba(255, 255, 255, 0.06);
+	.upcoming-arrow.theme-glass {
+		color: rgba(160, 180, 220, 0.3);
 	}
 
-	.badge-text.theme-glass {
-		color: rgba(180, 200, 230, 0.5);
-	}
-
-	/* 底部 */
 	.tip-text.theme-glass {
 		color: rgba(160, 180, 210, 0.3);
-	}
-
-	.empty-text.theme-glass {
-		color: rgba(200, 210, 240, 0.5);
 	}
 </style>
