@@ -9,7 +9,7 @@
 		onLaunch() {
 			console.log('App Launch')
 			const { currentTheme } = useTheme()
-			console.log('当前主题: ' + currentTheme.value)
+			console.log('Current theme: ' + currentTheme.value)
 		},
 		onShow() {
 			console.log('App Show')

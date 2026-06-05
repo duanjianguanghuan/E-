@@ -68,6 +68,14 @@
 				<text :class="['about-label', themeClass]">版本</text>
 				<text :class="['about-value', themeClass]">1.0.0</text>
 			</view>
+			<view :class="['about-item', themeClass]">
+				<text :class="['about-label', themeClass]">数据来源</text>
+				<text :class="['about-value', themeClass]">60s.viki.moe</text>
+			</view>
+			<view :class="['about-item', themeClass]">
+				<text :class="['about-label', themeClass]">功能说明</text>
+				<text :class="['about-value', themeClass]">Epic 每周免费游戏资讯</text>
+			</view>
 		</view>
 	</view>
 </template>
