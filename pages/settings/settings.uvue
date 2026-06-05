@@ -13,17 +13,82 @@
 
 		<!-- 页面内容 -->
 		<scroll-view scroll-y="true" class="content-scroll">
-			<!-- 主题切换 -->
+			<!-- 颜色模式 -->
 			<view :class="['section', themeClass]">
 				<view class="section-header">
-					<text :class="['section-title', themeClass]">界面主题</text>
+					<text :class="['section-title', themeClass]">颜色模式</text>
+					<text :class="['section-desc', themeClass]">选择浅色、深色或自动跟随系统</text>
+				</view>
+
+				<!-- 浅色模式 -->
+				<view
+					:class="['mode-card', themeClass, { active: isLight }]"
+					@tap="onSelectMode('light')"
+				>
+					<view :class="['mode-visual', 'visual-light', themeClass]">
+						<view class="visual-circle"></view>
+					</view>
+					<view class="mode-body">
+						<view class="mode-title-row">
+							<text :class="['mode-name', themeClass]">浅色模式</text>
+							<view v-if="isLight" :class="['check-icon', themeClass]">
+								<text class="check-text">✓</text>
+							</view>
+						</view>
+						<text :class="['mode-desc', themeClass]">明亮清爽</text>
+					</view>
+				</view>
+
+				<!-- 深色模式 -->
+				<view
+					:class="['mode-card', themeClass, { active: isDark }]"
+					@tap="onSelectMode('dark')"
+				>
+					<view :class="['mode-visual', 'visual-dark', themeClass]">
+						<view class="visual-circle"></view>
+					</view>
+					<view class="mode-body">
+						<view class="mode-title-row">
+							<text :class="['mode-name', themeClass]">深色模式</text>
+							<view v-if="isDark" :class="['check-icon', themeClass]">
+								<text class="check-text">✓</text>
+							</view>
+						</view>
+						<text :class="['mode-desc', themeClass]">省电护眼</text>
+					</view>
+				</view>
+
+				<!-- 跟随系统 -->
+				<view
+					:class="['mode-card', themeClass, { active: isAuto }]"
+					@tap="onSelectMode('auto')"
+				>
+					<view :class="['mode-visual', 'visual-auto', themeClass]">
+						<view class="visual-half-half"></view>
+					</view>
+					<view class="mode-body">
+						<view class="mode-title-row">
+							<text :class="['mode-name', themeClass]">跟随系统</text>
+							<view v-if="isAuto" :class="['check-icon', themeClass]">
+								<text class="check-text">✓</text>
+							</view>
+						</view>
+						<text :class="['mode-desc', themeClass]">自动切换</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 界面风格 -->
+			<view :class="['section', themeClass]">
+				<view class="section-header">
+					<text :class="['section-title', themeClass]">界面风格</text>
 					<text :class="['section-desc', themeClass]">选择你的专属风格</text>
 				</view>
 
 				<!-- 经典简约 -->
 				<view
 					:class="['theme-card', themeClass, { active: isNormal }]"
-					@tap="onSelectTheme('normal')"
+					@tap="onSelectStyle('normal')"
 				>
 					<view :class="['card-visual', themeClass]">
 						<view class="visual-bar"></view>
@@ -46,7 +111,7 @@
 				<!-- 液体玻璃 -->
 				<view
 					:class="['theme-card', themeClass, { active: isLiquidGlass }]"
-					@tap="onSelectTheme('liquid-glass')"
+					@tap="onSelectStyle('liquid-glass')"
 				>
 					<view :class="['card-visual', 'visual-glass', themeClass]">
 						<view class="visual-bar glass-bar"></view>
@@ -88,7 +153,7 @@
 					<text :class="['info-value', themeClass]">60s.viki.moe</text>
 				</view>
 
-				<view :class="['info-item', themeClass, 'info-item-last']">
+				<view :class="['info-item', themeClass]">
 					<text :class="['info-label', themeClass]">功能</text>
 					<text :class="['info-value', themeClass]">Epic 免费游戏资讯</text>
 				</view>
@@ -102,21 +167,43 @@
 
 <script setup lang="uts">
 	import { useTheme } from '@/composables/useTheme'
-	import type { ThemeType } from '@/composables/useTheme'
+	import type { ThemeStyle, ColorMode } from '@/composables/useTheme'
 	import { computed } from 'vue'
 
-	const { currentTheme, isLiquidGlass, isNormal, setTheme } = useTheme()
+	const {
+		currentStyle,
+		currentMode,
+		isNormal,
+		isLiquidGlass,
+		isLight,
+		isDark,
+		isAuto,
+		themeClass,
+		setStyle,
+		setMode,
+	} = useTheme()
 
-	const themeClass = computed(() => {
-		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
-	})
-
-	/* ========== 主题切换 ========== */
-	function onSelectTheme(theme: ThemeType) {
-		if (currentTheme.value === theme) return
-		setTheme(theme)
+	/* ========== 主题风格切换 ========== */
+	function onSelectStyle(style: ThemeStyle) {
+		if (currentStyle.value === style) return
+		setStyle(style)
 		uni.showToast({
-			title: theme === 'normal' ? '已切换为经典简约' : '已切换为液体玻璃',
+			title: style === 'normal' ? '已切换为经典简约' : '已切换为液体玻璃',
+			icon: 'none',
+			duration: 1500,
+		})
+	}
+
+	/* ========== 颜色模式切换 ========== */
+	function onSelectMode(mode: ColorMode) {
+		if (currentMode.value === mode) return
+		setMode(mode)
+		let title = ''
+		if (mode === 'light') title = '已切换为浅色模式'
+		else if (mode === 'dark') title = '已切换为深色模式'
+		else title = '已切换为跟随系统'
+		uni.showToast({
+			title,
 			icon: 'none',
 			duration: 1500,
 		})
@@ -130,7 +217,7 @@
 
 <style>
 	/* ===================================== */
-	/*              普通主题                  */
+	/*              通用样式                  */
 	/* ===================================== */
 
 	.settings-page {
@@ -138,15 +225,9 @@
 		flex-direction: column;
 	}
 
-	.settings-page.theme-normal {
-		background-color: #f2f2f7;
-	}
-
-	/* ---------- 头部 ---------- */
 	.header {
 		flex-shrink: 0;
 		padding: 48px 20px 16px 20px;
-		background-color: #ffffff;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
@@ -165,30 +246,25 @@
 
 	.back-icon {
 		font-size: 22px;
-		color: #007aff;
 	}
 
 	.header-title {
 		font-size: 18px;
 		font-weight: 700;
-		color: #1c1c1e;
 	}
 
 	.header-spacer {
 		width: 40px;
 	}
 
-	/* ---------- 内容区 ---------- */
 	.content-scroll {
 		flex: 1;
 	}
 
-	/* ---------- 分区 ---------- */
 	.section {
 		margin: 16px;
 		padding: 20px 18px;
 		border-radius: 16px;
-		background-color: #ffffff;
 	}
 
 	.section-header {
@@ -198,109 +274,19 @@
 	.section-title {
 		font-size: 16px;
 		font-weight: 700;
-		color: #1c1c1e;
 		display: block;
 	}
 
 	.section-desc {
 		font-size: 12px;
-		color: #8e8e93;
 		margin-top: 4px;
 		display: block;
-	}
-
-	/* ---------- 主题卡片 ---------- */
-	.theme-card {
-		flex-direction: row;
-		align-items: center;
-		padding: 12px;
-		border-radius: 14px;
-		background-color: #f8f8fa;
-		margin-bottom: 10px;
-		border: 2px solid transparent;
-	}
-
-	.theme-card:last-child {
-		margin-bottom: 0;
-	}
-
-	.theme-card.active {
-		border-color: #007aff;
-		background-color: #f0f7ff;
-	}
-
-	/* 卡片视觉预览 */
-	.card-visual {
-		width: 52px;
-		height: 52px;
-		border-radius: 10px;
-		overflow: hidden;
-		margin-right: 12px;
-		flex-shrink: 0;
-		background-color: #e8e8ed;
-	}
-
-	.visual-glass {
-		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
-	}
-
-	.visual-bar {
-		height: 10px;
-		background-color: #d1d1d6;
-	}
-
-	.glass-bar {
-		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
-	}
-
-	.visual-body {
-		flex: 1;
-		padding: 6px;
-		flex-direction: column;
-		justify-content: space-around;
-	}
-
-	.visual-block {
-		height: 7px;
-		border-radius: 3px;
-		background-color: #c7c7cc;
-	}
-
-	.visual-block.w80 {
-		width: 80%;
-	}
-
-	.visual-block.w50 {
-		width: 50%;
-	}
-
-	.glass-block {
-		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
-	}
-
-	/* 卡片内容 */
-	.card-body {
-		flex: 1;
-		flex-direction: column;
-	}
-
-	.card-title-row {
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.card-name {
-		font-size: 15px;
-		font-weight: 600;
-		color: #1c1c1e;
 	}
 
 	.check-icon {
 		width: 20px;
 		height: 20px;
 		border-radius: 10px;
-		background-color: #007aff;
 		align-items: center;
 		justify-content: center;
 	}
@@ -311,13 +297,6 @@
 		font-weight: 700;
 	}
 
-	.card-desc {
-		font-size: 12px;
-		color: #8e8e93;
-		margin-top: 4px;
-	}
-
-	/* ---------- 信息列表 ---------- */
 	.info-item {
 		flex-direction: row;
 		justify-content: space-between;
@@ -331,88 +310,921 @@
 
 	.info-label {
 		font-size: 15px;
-		color: #1c1c1e;
 	}
 
 	.info-value {
 		font-size: 15px;
-		color: #8e8e93;
 	}
 
-	/* ---------- 底部 ---------- */
 	.bottom-safe {
 		height: 34px;
 	}
 
 	/* ===================================== */
-	/*           液体玻璃主题                 */
+	/*          经典简约 + 浅色模式          */
 	/* ===================================== */
 
-	.settings-page.theme-glass {
+	.settings-page.theme-normal.mode-light {
+		background-color: #f2f2f7;
+	}
+
+	.theme-normal.mode-light .header {
+		background-color: #ffffff;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.theme-normal.mode-light .back-icon {
+		color: #007aff;
+	}
+
+	.theme-normal.mode-light .header-title {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .section {
+		background-color: #ffffff;
+	}
+
+	.theme-normal.mode-light .section-title {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .section-desc {
+		color: #8e8e93;
+	}
+
+	/* 颜色模式卡片 */
+	.theme-normal.mode-light .mode-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: #f8f8fa;
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-normal.mode-light .mode-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-light .mode-card.active {
+		border-color: #007aff;
+		background-color: #f0f7ff;
+	}
+
+	.theme-normal.mode-light .mode-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.theme-normal.mode-light .visual-light {
+		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+	}
+
+	.theme-normal.mode-light .visual-dark {
+		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+	}
+
+	.theme-normal.mode-light .visual-auto {
+		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+	}
+
+	.theme-normal.mode-light .visual-circle {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.theme-normal.mode-light .visual-dark .visual-circle {
+		background-color: rgba(60, 60, 67, 0.9);
+	}
+
+	.theme-normal.mode-light .visual-half-half {
+		width: 24px;
+		height: 24px;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.theme-normal.mode-light .mode-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-normal.mode-light .mode-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-normal.mode-light .mode-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .mode-desc {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 4px;
+	}
+
+	.theme-normal.mode-light .check-icon {
+		background-color: #007aff;
+	}
+
+	/* 主题风格卡片 */
+	.theme-normal.mode-light .theme-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: #f8f8fa;
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-normal.mode-light .theme-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-light .theme-card.active {
+		border-color: #007aff;
+		background-color: #f0f7ff;
+	}
+
+	.theme-normal.mode-light .card-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .visual-glass {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+	}
+
+	.theme-normal.mode-light .visual-bar {
+		height: 10px;
+		background-color: #d1d1d6;
+	}
+
+	.theme-normal.mode-light .glass-bar {
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-normal.mode-light .visual-body {
+		flex: 1;
+		padding: 6px;
+		flex-direction: column;
+		justify-content: space-around;
+	}
+
+	.theme-normal.mode-light .visual-block {
+		height: 7px;
+		border-radius: 3px;
+		background-color: #c7c7cc;
+	}
+
+	.theme-normal.mode-light .visual-block.w80 {
+		width: 80%;
+	}
+
+	.theme-normal.mode-light .visual-block.w50 {
+		width: 50%;
+	}
+
+	.theme-normal.mode-light .glass-block {
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-normal.mode-light .card-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-normal.mode-light .card-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-normal.mode-light .card-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .card-desc {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 4px;
+	}
+
+	.theme-normal.mode-light .info-label {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .info-value {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-light .info-item + .info-item {
+		border-top: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	/* ===================================== */
+	/*          经典简约 + 深色模式          */
+	/* ===================================== */
+
+	.settings-page.theme-normal.mode-dark {
+		background-color: #000000;
+	}
+
+	.theme-normal.mode-dark .header {
+		background-color: #1c1c1e;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-normal.mode-dark .back-icon {
+		color: #64d2ff;
+	}
+
+	.theme-normal.mode-dark .header-title {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .section {
+		background-color: #1c1c1e;
+	}
+
+	.theme-normal.mode-dark .section-title {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .section-desc {
+		color: #8e8e93;
+	}
+
+	/* 颜色模式卡片 */
+	.theme-normal.mode-dark .mode-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: #2c2c2e;
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-normal.mode-dark .mode-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-dark .mode-card.active {
+		border-color: #64d2ff;
+		background-color: rgba(100, 210, 255, 0.12);
+	}
+
+	.theme-normal.mode-dark .mode-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.theme-normal.mode-dark .visual-light {
+		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+	}
+
+	.theme-normal.mode-dark .visual-dark {
+		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+	}
+
+	.theme-normal.mode-dark .visual-auto {
+		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+	}
+
+	.theme-normal.mode-dark .visual-circle {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.theme-normal.mode-dark .visual-dark .visual-circle {
+		background-color: rgba(60, 60, 67, 0.9);
+	}
+
+	.theme-normal.mode-dark .visual-half-half {
+		width: 24px;
+		height: 24px;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.theme-normal.mode-dark .mode-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-normal.mode-dark .mode-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-normal.mode-dark .mode-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .mode-desc {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 4px;
+	}
+
+	.theme-normal.mode-dark .check-icon {
+		background-color: #64d2ff;
+	}
+
+	/* 主题风格卡片 */
+	.theme-normal.mode-dark .theme-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color #2c2c2e;
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-normal.mode-dark .theme-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-dark .theme-card.active {
+		border-color: #64d2ff;
+		background-color: rgba(100, 210, 255, 0.12);
+	}
+
+	.theme-normal.mode-dark .card-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .visual-glass {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+	}
+
+	.theme-normal.mode-dark .visual-bar {
+		height: 10px;
+		background-color: #3a3a3c;
+	}
+
+	.theme-normal.mode-dark .glass-bar {
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-normal.mode-dark .visual-body {
+		flex: 1;
+		padding: 6px;
+		flex-direction: column;
+		justify-content: space-around;
+	}
+
+	.theme-normal.mode-dark .visual-block {
+		height: 7px;
+		border-radius: 3px;
+		background-color: #3a3a3c;
+	}
+
+	.theme-normal.mode-dark .visual-block.w80 {
+		width: 80%;
+	}
+
+	.theme-normal.mode-dark .visual-block.w50 {
+		width: 50%;
+	}
+
+	.theme-normal.mode-dark .glass-block {
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-normal.mode-dark .card-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-normal.mode-dark .card-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-normal.mode-dark .card-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .card-desc {
+		font-size: 12px;
+		color: #8e8e93;
+		margin-top: 4px;
+	}
+
+	.theme-normal.mode-dark .info-label {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .info-value {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-dark .info-item + .info-item {
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	/* ===================================== */
+	/*          液体玻璃主题 + 浅色模式      */
+	/* ===================================== */
+
+	.settings-page.theme-glass.mode-light {
+		background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 50%, #f6f8fb 100%);
+	}
+
+	.theme-glass.mode-light .header {
+		background: rgba(255, 255, 255, 0.8);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.theme-glass.mode-light .back-icon {
+		color: #5b7cf5;
+	}
+
+	.theme-glass.mode-light .header-title {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .section {
+		background: rgba(255, 255, 255, 0.7);
+		border: 1px solid rgba(91, 124, 245, 0.12);
+	}
+
+	.theme-glass.mode-light .section-title {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .section-desc {
+		color: #64748b;
+	}
+
+	/* 颜色模式卡片 */
+	.theme-glass.mode-light .mode-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-glass.mode-light .mode-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-light .mode-card.active {
+		border-color: #5b7cf5;
+		background-color: rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .mode-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.theme-glass.mode-light .visual-light {
+		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+	}
+
+	.theme-glass.mode-light .visual-dark {
+		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+	}
+
+	.theme-glass.mode-light .visual-auto {
+		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+	}
+
+	.theme-glass.mode-light .visual-circle {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.theme-glass.mode-light .visual-dark .visual-circle {
+		background-color: rgba(60, 60, 67, 0.9);
+	}
+
+	.theme-glass.mode-light .visual-half-half {
+		width: 24px;
+		height: 24px;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.theme-glass.mode-light .mode-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-glass.mode-light .mode-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-glass.mode-light .mode-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .mode-desc {
+		font-size: 12px;
+		color: #64748b;
+		margin-top: 4px;
+	}
+
+	.theme-glass.mode-light .check-icon {
+		background-color: #5b7cf5;
+	}
+
+	/* 主题风格卡片 */
+	.theme-glass.mode-light .theme-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-glass.mode-light .theme-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-light .theme-card.active {
+		border-color: #5b7cf5;
+		background-color: rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .card-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		background: linear-gradient(135deg, rgba(200, 208, 240, 0.4), rgba(220, 212, 255, 0.3));
+	}
+
+	.theme-glass.mode-light .visual-glass {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+	}
+
+	.theme-glass.mode-light .visual-bar {
+		height: 10px;
+		background-color: rgba(100, 116, 139, 0.2);
+	}
+
+	.theme-glass.mode-light .glass-bar {
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-glass.mode-light .visual-body {
+		flex: 1;
+		padding: 6px;
+		flex-direction: column;
+		justify-content: space-around;
+	}
+
+	.theme-glass.mode-light .visual-block {
+		height: 7px;
+		border-radius: 3px;
+		background-color: rgba(100, 116, 139, 0.15);
+	}
+
+	.theme-glass.mode-light .visual-block.w80 {
+		width: 80%;
+	}
+
+	.theme-glass.mode-light .visual-block.w50 {
+		width: 50%;
+	}
+
+	.theme-glass.mode-light .glass-block {
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-glass.mode-light .card-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-glass.mode-light .card-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-glass.mode-light .card-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .card-desc {
+		font-size: 12px;
+		color: #64748b;
+		margin-top: 4px;
+	}
+
+	.theme-glass.mode-light .info-label {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .info-value {
+		color: #64748b;
+	}
+
+	.theme-glass.mode-light .info-item + .info-item {
+		border-top: 1px solid rgba(91, 124, 245, 0.1);
+	}
+
+	/* ===================================== */
+	/*          液体玻璃主题 + 深色模式      */
+	/* ===================================== */
+
+	.settings-page.theme-glass.mode-dark {
 		background: linear-gradient(135deg, #0a0a1a 0%, #1a1030 30%, #0d1b2a 60%, #0a0a1a 100%);
 	}
 
-	.header.theme-glass {
+	.theme-glass.mode-dark .header {
 		background: rgba(255, 255, 255, 0.04);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.back-icon.theme-glass {
+	.theme-glass.mode-dark .back-icon {
 		color: rgba(160, 200, 255, 0.9);
 	}
 
-	.header-title.theme-glass {
+	.theme-glass.mode-dark .header-title {
 		color: rgba(255, 255, 255, 0.92);
 	}
 
-	.section.theme-glass {
+	.theme-glass.mode-dark .section {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.section-title.theme-glass {
+	.theme-glass.mode-dark .section-title {
 		color: rgba(255, 255, 255, 0.9);
 	}
 
-	.section-desc.theme-glass {
+	.theme-glass.mode-dark .section-desc {
 		color: rgba(190, 205, 235, 0.5);
 	}
 
-	.theme-card.theme-glass {
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+	/* 颜色模式卡片 */
+	.theme-glass.mode-dark .mode-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: rgba(255, 255, 255, 0.04);
+		margin-bottom: 10px;
+		border: 2px solid transparent;
 	}
 
-	.theme-card.theme-glass.active {
-		background: rgba(100, 140, 255, 0.12);
+	.theme-glass.mode-dark .mode-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-dark .mode-card.active {
 		border-color: rgba(140, 170, 255, 0.4);
+		background-color: rgba(120, 150, 255, 0.1);
 	}
 
-	.card-visual.theme-glass {
+	.theme-glass.mode-dark .mode-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.theme-glass.mode-dark .visual-light {
+		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+	}
+
+	.theme-glass.mode-dark .visual-dark {
+		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+	}
+
+	.theme-glass.mode-dark .visual-auto {
+		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+	}
+
+	.theme-glass.mode-dark .visual-circle {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.theme-glass.mode-dark .visual-dark .visual-circle {
+		background-color: rgba(60, 60, 67, 0.9);
+	}
+
+	.theme-glass.mode-dark .visual-half-half {
+		width: 24px;
+		height: 24px;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.theme-glass.mode-dark .mode-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-glass.mode-dark .mode-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-glass.mode-dark .mode-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: rgba(240, 245, 255, 0.9);
+	}
+
+	.theme-glass.mode-dark .mode-desc {
+		font-size: 12px;
+		color: rgba(190, 205, 235, 0.5);
+		margin-top: 4px;
+	}
+
+	.theme-glass.mode-dark .check-icon {
+		background: rgba(120, 160, 255, 0.8);
+		box-shadow: 0 0 12px rgba(120, 160, 255, 0.3);
+	}
+
+	/* 主题风格卡片 */
+	.theme-glass.mode-dark .theme-card {
+		flex-direction: row;
+		align-items: center;
+		padding: 12px;
+		border-radius: 14px;
+		background-color: rgba(255, 255, 255, 0.04);
+		margin-bottom: 10px;
+		border: 2px solid transparent;
+	}
+
+	.theme-glass.mode-dark .theme-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-dark .theme-card.active {
+		border-color: rgba(140, 170, 255, 0.4);
+		background-color: rgba(120, 150, 255, 0.1);
+		box-shadow: 0 0 20px rgba(100, 140, 255, 0.15);
+	}
+
+	.theme-glass.mode-dark .card-visual {
+		width: 52px;
+		height: 52px;
+		border-radius: 10px;
+		overflow: hidden;
+		margin-right: 12px;
+		flex-shrink: 0;
 		background: rgba(255, 255, 255, 0.06);
 	}
 
-	.card-name.theme-glass {
+	.theme-glass.mode-dark .visual-glass {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+	}
+
+	.theme-glass.mode-dark .visual-bar {
+		height: 10px;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-glass.mode-dark .glass-bar {
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-glass.mode-dark .visual-body {
+		flex: 1;
+		padding: 6px;
+		flex-direction: column;
+		justify-content: space-around;
+	}
+
+	.theme-glass.mode-dark .visual-block {
+		height: 7px;
+		border-radius: 3px;
+		background-color: rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-glass.mode-dark .visual-block.w80 {
+		width: 80%;
+	}
+
+	.theme-glass.mode-dark .visual-block.w50 {
+		width: 50%;
+	}
+
+	.theme-glass.mode-dark .glass-block {
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+	}
+
+	.theme-glass.mode-dark .card-body {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.theme-glass.mode-dark .card-title-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.theme-glass.mode-dark .card-name {
+		font-size: 15px;
+		font-weight: 600;
 		color: rgba(235, 240, 255, 0.9);
 	}
 
-	.check-icon.theme-glass {
-		background: rgba(120, 160, 255, 0.8);
-	}
-
-	.card-desc.theme-glass {
+	.theme-glass.mode-dark .card-desc {
+		font-size: 12px;
 		color: rgba(180, 195, 225, 0.5);
+		margin-top: 4px;
 	}
 
-	.info-item.theme-glass + .info-item.theme-glass {
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.info-label.theme-glass {
+	.theme-glass.mode-dark .info-label {
 		color: rgba(235, 240, 255, 0.85);
 	}
 
-	.info-value.theme-glass {
+	.theme-glass.mode-dark .info-value {
 		color: rgba(190, 205, 235, 0.5);
+	}
+
+	.theme-glass.mode-dark .info-item + .info-item {
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
 	}
 </style>

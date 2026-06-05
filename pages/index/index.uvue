@@ -9,10 +9,7 @@
 					<text :class="['subtitle', themeClass]">Epic 每周免费游戏</text>
 				</view>
 				<view class="navbar-right">
-					<view
-						:class="['icon-btn', themeClass, { loading: isRefreshing }]"
-						@tap="onRefreshTap"
-					>
+					<view :class="['icon-btn', themeClass, { loading: isRefreshing }]" @tap="onRefreshTap">
 						<text :class="['icon-text', themeClass]">{{ isRefreshing ? '⟳' : '↻' }}</text>
 					</view>
 					<view :class="['icon-btn', themeClass]" @tap="goSettings">
@@ -171,14 +168,10 @@
 	import type { EpicGame } from '@/api/epic'
 	import { ref, computed } from 'vue'
 
-	const { currentTheme } = useTheme()
-
-	const themeClass = computed(() => {
-		return currentTheme.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
-	})
+	const { currentTheme, themeClass } = useTheme()
 
 	/* ========== 状态 ========== */
-	const isSkeleton = ref(true) // 骨架屏初始开启
+	const isSkeleton = ref(true)
 	const isRefreshing = ref(false)
 	const errorMsg = ref<string | null>(null)
 	const freeNowGames = ref<EpicGame[]>([])
@@ -209,7 +202,7 @@
 		loadGames(true)
 	}
 
-	/* ========== 刷新按钮点击（防抖）========== */
+	/* ========== 刷新按钮点击（防抖） ========== */
 	let refreshTimer: number | null = null
 	function onRefreshTap() {
 		if (isRefreshing.value) return
@@ -246,7 +239,7 @@
 			return
 		}
 		uni.showToast({
-			title: '正在打开 Epic 商店...',
+			title: '正在打开 Epic 商店',
 			icon: 'loading',
 			duration: 1500,
 		})
@@ -296,7 +289,7 @@
 
 <style>
 	/* ===================================== */
-	/*              普通主题                  */
+	/*              通用样式                  */
 	/* ===================================== */
 
 	.home-page {
@@ -304,19 +297,12 @@
 		flex-direction: column;
 	}
 
-	.home-page.theme-normal {
-		background-color: #f2f2f7;
-	}
-
-	/* ---------- 导航栏 ---------- */
 	.navbar-wrap {
 		flex-shrink: 0;
-		background-color: #ffffff;
 	}
 
 	.status-bar {
 		height: 44px;
-		background-color: #ffffff;
 	}
 
 	.navbar {
@@ -324,23 +310,10 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 12px 20px 16px 20px;
-		background-color: #ffffff;
 	}
 
 	.navbar-left {
 		flex-direction: column;
-	}
-
-	.greeting {
-		font-size: 22px;
-		font-weight: 800;
-		color: #1c1c1e;
-	}
-
-	.subtitle {
-		font-size: 13px;
-		color: #8e8e93;
-		margin-top: 2px;
 	}
 
 	.navbar-right {
@@ -348,31 +321,33 @@
 		align-items: center;
 	}
 
+	.greeting {
+		font-size: 22px;
+		font-weight: 800;
+	}
+
+	.subtitle {
+		font-size: 13px;
+		margin-top: 2px;
+	}
+
 	.icon-btn {
 		width: 40px;
 		height: 40px;
 		border-radius: 12px;
-		background-color: #f2f2f7;
 		align-items: center;
 		justify-content: center;
 		margin-left: 8px;
 	}
 
-	.icon-btn.loading {
-		background-color: #e8f2ff;
-	}
-
 	.icon-text {
 		font-size: 18px;
-		color: #007aff;
 	}
 
-	/* ---------- 内容滚动区 ---------- */
 	.content-scroll {
 		flex: 1;
 	}
 
-	/* ---------- 骨架屏 ---------- */
 	.skeleton-wrap {
 		padding: 0 4px;
 	}
@@ -384,7 +359,6 @@
 	.skeleton-header {
 		height: 20px;
 		width: 100px;
-		background-color: #e8e8ed;
 		margin: 20px 20px 12px 20px;
 	}
 
@@ -400,7 +374,6 @@
 	.skeleton-card {
 		width: 200px;
 		margin-right: 12px;
-		background-color: #ffffff;
 		border-radius: 16px;
 		overflow: hidden;
 		flex-shrink: 0;
@@ -408,12 +381,10 @@
 
 	.skeleton-img {
 		height: 112px;
-		background-color: #e8e8ed;
 	}
 
 	.skeleton-text {
 		height: 12px;
-		background-color: #e8e8ed;
 		margin: 12px 14px 6px 14px;
 	}
 
@@ -435,7 +406,6 @@
 	.skeleton-thumb {
 		width: 60px;
 		height: 36px;
-		background-color: #e8e8ed;
 		border-radius: 6px;
 		margin-right: 12px;
 	}
@@ -444,7 +414,6 @@
 		flex: 1;
 	}
 
-	/* ---------- 状态页 ---------- */
 	.state-wrap {
 		padding: 100px 40px 60px 40px;
 		align-items: center;
@@ -457,13 +426,11 @@
 
 	.state-text {
 		font-size: 15px;
-		color: #8e8e93;
 		text-align: center;
 	}
 
 	.state-sub {
 		font-size: 13px;
-		color: #c7c7cc;
 		margin-top: 8px;
 	}
 
@@ -471,16 +438,13 @@
 		margin-top: 24px;
 		padding: 12px 32px;
 		border-radius: 12px;
-		background-color: #007aff;
 	}
 
 	.state-btn-text {
 		font-size: 14px;
-		color: #ffffff;
 		font-weight: 600;
 	}
 
-	/* ---------- 数据内容 ---------- */
 	.data-wrap {
 		padding-bottom: 10px;
 	}
@@ -497,13 +461,10 @@
 	.section-label {
 		font-size: 17px;
 		font-weight: 700;
-		color: #1c1c1e;
 	}
 
 	.section-badge {
 		font-size: 10px;
-		color: #ffffff;
-		background-color: #ff3b30;
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-weight: 600;
@@ -512,15 +473,12 @@
 
 	.section-badge-outline {
 		font-size: 10px;
-		color: #007aff;
-		background-color: #e8f2ff;
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-weight: 600;
 		margin-left: 8px;
 	}
 
-	/* ---------- 游戏卡片（横向滚动）---------- */
 	.card-scroll {
 		width: 100%;
 	}
@@ -536,8 +494,6 @@
 		flex-direction: column;
 		margin-right: 12px;
 		border-radius: 16px;
-		background-color: #ffffff;
-		border: 1px solid rgba(0, 0, 0, 0.06);
 		overflow: hidden;
 		flex-shrink: 0;
 	}
@@ -549,7 +505,6 @@
 	.game-cover {
 		width: 200px;
 		height: 112px;
-		background-color: #e8e8ed;
 	}
 
 	.free-tag {
@@ -557,8 +512,6 @@
 		top: 8px;
 		left: 8px;
 		font-size: 10px;
-		color: #ffffff;
-		background-color: #34c759;
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-weight: 600;
@@ -571,13 +524,11 @@
 	.game-title {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1c1c1e;
 		lines: 1;
 	}
 
 	.game-desc {
 		font-size: 11px;
-		color: #8e8e93;
 		margin-top: 4px;
 		lines: 1;
 	}
@@ -588,10 +539,8 @@
 
 	.game-time {
 		font-size: 11px;
-		color: #b0b0b8;
 	}
 
-	/* ---------- 即将推出列表 ---------- */
 	.upcoming-list {
 		padding: 0 16px;
 	}
@@ -602,15 +551,12 @@
 		padding: 12px 14px;
 		margin-bottom: 10px;
 		border-radius: 14px;
-		background-color: #ffffff;
-		border: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
 	.upcoming-thumb {
 		width: 56px;
 		height: 36px;
 		border-radius: 6px;
-		background-color: #e8e8ed;
 		margin-right: 12px;
 		flex-shrink: 0;
 	}
@@ -622,30 +568,25 @@
 	.upcoming-title {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1c1c1e;
 		lines: 1;
 	}
 
 	.upcoming-seller {
 		font-size: 11px;
-		color: #8e8e93;
 		margin-top: 2px;
 		lines: 1;
 	}
 
 	.upcoming-date {
 		font-size: 11px;
-		color: #b0b0b8;
 		margin-top: 4px;
 	}
 
 	.upcoming-arrow {
 		font-size: 20px;
-		color: #d1d1d6;
 		margin-left: 8px;
 	}
 
-	/* ---------- 底部 ---------- */
 	.footer-tip {
 		padding: 20px;
 		align-items: center;
@@ -653,7 +594,6 @@
 
 	.tip-text {
 		font-size: 11px;
-		color: #c7c7cc;
 	}
 
 	.bottom-safe {
@@ -661,127 +601,592 @@
 	}
 
 	/* ===================================== */
-	/*           液体玻璃主题                 */
+	/*          经典简约 + 浅色模式          */
 	/* ===================================== */
 
-	.home-page.theme-glass {
+	.home-page.theme-normal.mode-light {
+		background-color: #f2f2f7;
+	}
+
+	.theme-normal.mode-light .navbar-wrap {
+		background-color: #ffffff;
+	}
+
+	.theme-normal.mode-light .status-bar {
+		background-color: #ffffff;
+	}
+
+	.theme-normal.mode-light .navbar {
+		background-color: #ffffff;
+	}
+
+	.theme-normal.mode-light .greeting {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .subtitle {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-light .icon-btn {
+		background-color: #f2f2f7;
+	}
+
+	.theme-normal.mode-light .icon-btn.loading {
+		background-color: #e8f2ff;
+	}
+
+	.theme-normal.mode-light .icon-text {
+		color: #007aff;
+	}
+
+	.theme-normal.mode-light .skeleton-header {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .skeleton-card {
+		background-color: #ffffff;
+	}
+
+	.theme-normal.mode-light .skeleton-img {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .skeleton-text {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .skeleton-thumb {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .state-text {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-light .state-sub {
+		color: #c7c7cc;
+	}
+
+	.theme-normal.mode-light .state-btn {
+		background-color: #007aff;
+	}
+
+	.theme-normal.mode-light .state-btn-text {
+		color: #ffffff;
+	}
+
+	.theme-normal.mode-light .section-label {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .section-badge {
+		color: #ffffff;
+		background-color: #ff3b30;
+	}
+
+	.theme-normal.mode-light .section-badge-outline {
+		color: #007aff;
+		background-color: #e8f2ff;
+	}
+
+	.theme-normal.mode-light .game-card {
+		background-color: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.theme-normal.mode-light .game-cover {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .free-tag {
+		color: #ffffff;
+		background-color: #34c759;
+	}
+
+	.theme-normal.mode-light .game-title {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .game-desc {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-light .game-time {
+		color: #b0b0b8;
+	}
+
+	.theme-normal.mode-light .upcoming-item {
+		background-color: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.theme-normal.mode-light .upcoming-thumb {
+		background-color: #e8e8ed;
+	}
+
+	.theme-normal.mode-light .upcoming-title {
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .upcoming-seller {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-light .upcoming-date {
+		color: #b0b0b8;
+	}
+
+	.theme-normal.mode-light .upcoming-arrow {
+		color: #d1d1d6;
+	}
+
+	.theme-normal.mode-light .tip-text {
+		color: #c7c7cc;
+	}
+
+	/* ===================================== */
+	/*          经典简约 + 深色模式          */
+	/* ===================================== */
+
+	.home-page.theme-normal.mode-dark {
+		background-color: #000000;
+	}
+
+	.theme-normal.mode-dark .navbar-wrap {
+		background-color: #1c1c1e;
+	}
+
+	.theme-normal.mode-dark .status-bar {
+		background-color: #1c1c1e;
+	}
+
+	.theme-normal.mode-dark .navbar {
+		background-color: #1c1c1e;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-normal.mode-dark .greeting {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .subtitle {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-dark .icon-btn {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .icon-btn.loading {
+		background-color: rgba(100, 210, 255, 0.12);
+	}
+
+	.theme-normal.mode-dark .icon-text {
+		color: #64d2ff;
+	}
+
+	.theme-normal.mode-dark .skeleton-header {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .skeleton-card {
+		background-color: #1c1c1e;
+	}
+
+	.theme-normal.mode-dark .skeleton-img {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .skeleton-text {
+		background-color: #3a3a3c;
+	}
+
+	.theme-normal.mode-dark .skeleton-thumb {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .state-text {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-dark .state-sub {
+		color: #636366;
+	}
+
+	.theme-normal.mode-dark .state-btn {
+		background-color: rgba(100, 210, 255, 0.2);
+		border: 1px solid rgba(100, 210, 255, 0.2);
+	}
+
+	.theme-normal.mode-dark .state-btn-text {
+		color: rgba(180, 210, 255, 0.9);
+	}
+
+	.theme-normal.mode-dark .section-label {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .section-badge {
+		color: #ffffff;
+		background-color: #ff3b30;
+	}
+
+	.theme-normal.mode-dark .section-badge-outline {
+		color: #64d2ff;
+		background-color: rgba(100, 210, 255, 0.15);
+	}
+
+	.theme-normal.mode-dark .game-card {
+		background-color: #1c1c1e;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-normal.mode-dark .game-cover {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .free-tag {
+		color: rgba(150, 255, 180, 0.95);
+		background-color: rgba(52, 199, 89, 0.3);
+	}
+
+	.theme-normal.mode-dark .game-title {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .game-desc {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-dark .game-time {
+		color: #636366;
+	}
+
+	.theme-normal.mode-dark .upcoming-item {
+		background-color: #1c1c1e;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-normal.mode-dark .upcoming-thumb {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .upcoming-title {
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .upcoming-seller {
+		color: #8e8e93;
+	}
+
+	.theme-normal.mode-dark .upcoming-date {
+		color: #636366;
+	}
+
+	.theme-normal.mode-dark .upcoming-arrow {
+		color: #3a3a3c;
+	}
+
+	.theme-normal.mode-dark .tip-text {
+		color: #3a3a3c;
+	}
+
+	/* ===================================== */
+	/*          液体玻璃主题 + 浅色模式      */
+	/* ===================================== */
+
+	.home-page.theme-glass.mode-light {
+		background: linear-gradient(160deg, #f8fafc 0%, #eef2f7 25%, #e6f0ff 50%, #f0f6fb 75%, #f8fafc 100%);
+	}
+
+	.theme-glass.mode-light .navbar-wrap {
+		background: rgba(255, 255, 255, 0.8);
+	}
+
+	.theme-glass.mode-light .status-bar {
+		background: rgba(255, 255, 255, 0.8);
+	}
+
+	.theme-glass.mode-light .navbar {
+		background: rgba(255, 255, 255, 0.8);
+		border-bottom: 1px solid rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .greeting {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .subtitle {
+		color: #64748b;
+	}
+
+	.theme-glass.mode-light .icon-btn {
+		background: rgba(255, 255, 255, 0.6);
+		border: 1px solid rgba(91, 124, 245, 0.12);
+	}
+
+	.theme-glass.mode-light .icon-btn.loading {
+		background: rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .icon-text {
+		color: #5b7cf5;
+	}
+
+	.theme-glass.mode-light .skeleton-header {
+		background: rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .skeleton-card {
+		background: rgba(255, 255, 255, 0.7);
+		border: 1px solid rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .skeleton-img {
+		background: rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .skeleton-text {
+		background: rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .skeleton-thumb {
+		background: rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .state-text {
+		color: #64748b;
+	}
+
+	.theme-glass.mode-light .state-sub {
+		color: #94a3b8;
+	}
+
+	.theme-glass.mode-light .state-btn {
+		background: rgba(91, 124, 245, 0.15);
+		border: 1px solid rgba(91, 124, 245, 0.2);
+	}
+
+	.theme-glass.mode-light .state-btn-text {
+		color: #5b7cf5;
+	}
+
+	.theme-glass.mode-light .section-label {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .section-badge {
+		color: #ffffff;
+		background-color: rgba(239, 68, 68, 0.9);
+	}
+
+	.theme-glass.mode-light .section-badge-outline {
+		color: #5b7cf5;
+		background-color: rgba(91, 124, 245, 0.12);
+	}
+
+	.theme-glass.mode-light .game-card {
+		background: rgba(255, 255, 255, 0.7);
+		border: 1px solid rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .game-cover {
+		background: rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .free-tag {
+		color: rgba(22, 163, 74, 0.95);
+		background-color: rgba(34, 197, 94, 0.15);
+	}
+
+	.theme-glass.mode-light .game-title {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .game-desc {
+		color: #64748b;
+	}
+
+	.theme-glass.mode-light .game-time {
+		color: #94a3b8;
+	}
+
+	.theme-glass.mode-light .upcoming-item {
+		background: rgba(255, 255, 255, 0.7);
+		border: 1px solid rgba(91, 124, 245, 0.1);
+	}
+
+	.theme-glass.mode-light .upcoming-thumb {
+		background: rgba(91, 124, 245, 0.08);
+	}
+
+	.theme-glass.mode-light .upcoming-title {
+		color: #1e293b;
+	}
+
+	.theme-glass.mode-light .upcoming-seller {
+		color: #64748b;
+	}
+
+	.theme-glass.mode-light .upcoming-date {
+		color: #94a3b8;
+	}
+
+	.theme-glass.mode-light .upcoming-arrow {
+		color: #cbd5e1;
+	}
+
+	.theme-glass.mode-light .tip-text {
+		color: #94a3b8;
+	}
+
+	/* ===================================== */
+	/*          液体玻璃主题 + 深色模式      */
+	/* ===================================== */
+
+	.home-page.theme-glass.mode-dark {
 		background: linear-gradient(160deg, #0a0a1a 0%, #1a1030 25%, #0d1b2a 50%, #0f0f24 75%, #0a0a1a 100%);
 	}
 
-	.navbar-wrap.theme-glass {
-		background: rgba(255, 255, 255, 0.03);
+	.theme-glass.mode-dark .navbar-wrap {
+		background: rgba(255, 255, 255, 0.04);
 	}
 
-	.status-bar.theme-glass {
-		background: rgba(255, 255, 255, 0.03);
+	.theme-glass.mode-dark .status-bar {
+		background: rgba(255, 255, 255, 0.04);
 	}
 
-	.navbar.theme-glass {
-		background: rgba(255, 255, 255, 0.03);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	.theme-glass.mode-dark .navbar {
+		background: rgba(255, 255, 255, 0.04);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.greeting.theme-glass {
+	.theme-glass.mode-dark .greeting {
 		color: rgba(255, 255, 255, 0.92);
 	}
 
-	.subtitle.theme-glass {
+	.theme-glass.mode-dark .subtitle {
 		color: rgba(190, 205, 235, 0.5);
 	}
 
-	.icon-btn.theme-glass {
+	.theme-glass.mode-dark .icon-btn {
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.icon-btn.loading.theme-glass {
+	.theme-glass.mode-dark .icon-btn.loading {
 		background: rgba(120, 150, 255, 0.1);
 	}
 
-	.icon-text.theme-glass {
+	.theme-glass.mode-dark .icon-text {
 		color: rgba(160, 200, 255, 0.9);
 	}
 
-	.state-text.theme-glass {
-		color: rgba(200, 210, 240, 0.6);
+	.theme-glass.mode-dark .skeleton-header {
+		background: rgba(255, 255, 255, 0.06);
 	}
 
-	.state-sub.theme-glass {
-		color: rgba(160, 180, 210, 0.4);
-	}
-
-	.state-btn.theme-glass {
-		background: rgba(120, 160, 255, 0.25);
-		border: 1px solid rgba(120, 160, 255, 0.2);
-	}
-
-	.state-btn-text.theme-glass {
-		color: rgba(180, 210, 255, 0.9);
-	}
-
-	.section-label.theme-glass {
-		color: rgba(240, 245, 255, 0.88);
-	}
-
-	.section-badge-outline.theme-glass {
-		background: rgba(120, 160, 255, 0.15);
-		color: rgba(140, 180, 255, 0.85);
-	}
-
-	/* 游戏卡片 */
-	.game-card.theme-glass {
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-	}
-
-	.game-cover.theme-glass {
-		background-color: rgba(255, 255, 255, 0.03);
-	}
-
-	.free-tag.theme-glass {
-		background: rgba(52, 199, 89, 0.35);
-		color: rgba(150, 255, 180, 0.95);
-	}
-
-	.game-title.theme-glass {
-		color: rgba(235, 240, 255, 0.9);
-	}
-
-	.game-desc.theme-glass {
-		color: rgba(180, 195, 225, 0.5);
-	}
-
-	.game-time.theme-glass {
-		color: rgba(160, 175, 210, 0.4);
-	}
-
-	/* 即将推出 */
-	.upcoming-item.theme-glass {
+	.theme-glass.mode-dark .skeleton-card {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
-	.upcoming-thumb.theme-glass {
+	.theme-glass.mode-dark .skeleton-img {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.theme-glass.mode-dark .skeleton-text {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.theme-glass.mode-dark .skeleton-thumb {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.theme-glass.mode-dark .state-text {
+		color: rgba(200, 210, 240, 0.6);
+	}
+
+	.theme-glass.mode-dark .state-sub {
+		color: rgba(160, 180, 210, 0.4);
+	}
+
+	.theme-glass.mode-dark .state-btn {
+		background: rgba(120, 160, 255, 0.25);
+		border: 1px solid rgba(120, 160, 255, 0.2);
+	}
+
+	.theme-glass.mode-dark .state-btn-text {
+		color: rgba(180, 210, 255, 0.9);
+	}
+
+	.theme-glass.mode-dark .section-label {
+		color: rgba(240, 245, 255, 0.88);
+	}
+
+	.theme-glass.mode-dark .section-badge {
+		background: rgba(239, 68, 68, 0.3);
+		color: rgba(255, 180, 180, 0.95);
+	}
+
+	.theme-glass.mode-dark .section-badge-outline {
+		background: rgba(120, 160, 255, 0.15);
+		color: rgba(140, 180, 255, 0.85);
+	}
+
+	.theme-glass.mode-dark .game-card {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.07);
+	}
+
+	.theme-glass.mode-dark .game-cover {
 		background-color: rgba(255, 255, 255, 0.03);
 	}
 
-	.upcoming-title.theme-glass {
+	.theme-glass.mode-dark .free-tag {
+		background: rgba(52, 199, 89, 0.35);
+		color: rgba(150, 255, 180, 0.95);
+	}
+
+	.theme-glass.mode-dark .game-title {
 		color: rgba(235, 240, 255, 0.9);
 	}
 
-	.upcoming-seller.theme-glass {
+	.theme-glass.mode-dark .game-desc {
 		color: rgba(180, 195, 225, 0.5);
 	}
 
-	.upcoming-date.theme-glass {
+	.theme-glass.mode-dark .game-time {
 		color: rgba(160, 175, 210, 0.4);
 	}
 
-	.upcoming-arrow.theme-glass {
+	.theme-glass.mode-dark .upcoming-item {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.theme-glass.mode-dark .upcoming-thumb {
+		background-color: rgba(255, 255, 255, 0.03);
+	}
+
+	.theme-glass.mode-dark .upcoming-title {
+		color: rgba(235, 240, 255, 0.9);
+	}
+
+	.theme-glass.mode-dark .upcoming-seller {
+		color: rgba(180, 195, 225, 0.5);
+	}
+
+	.theme-glass.mode-dark .upcoming-date {
+		color: rgba(160, 175, 210, 0.4);
+	}
+
+	.theme-glass.mode-dark .upcoming-arrow {
 		color: rgba(160, 180, 220, 0.3);
 	}
 
-	.tip-text.theme-glass {
+	.theme-glass.mode-dark .tip-text {
 		color: rgba(160, 180, 210, 0.3);
 	}
 </style>

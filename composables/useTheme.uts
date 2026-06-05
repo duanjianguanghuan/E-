@@ -1,37 +1,79 @@
 import { ref, computed } from 'vue'
 
-export type ThemeType = 'normal' | 'liquid-glass'
+/* ========== 类型定义 ========== */
+// 主题风格
+export type ThemeStyle = 'normal' | 'liquid-glass'
+// 颜色模式
+export type ColorMode = 'light' | 'dark' | 'auto'
 
 let initialized = false
-const currentTheme = ref<ThemeType>('normal')
 
+/* ========== 状态 ========== */
+const currentStyle = ref<ThemeStyle>('normal')
+const currentMode = ref<ColorMode>('auto')
+
+/* ========== 核心函数 ========== */
 export function useTheme() {
 	if (!initialized) {
-		const saved = uni.getStorageSync('app_theme')
-		if (saved === 'liquid-glass' || saved === 'normal') {
-			currentTheme.value = saved as ThemeType
+		// 读取风格
+		const savedStyle = uni.getStorageSync('app_theme_style')
+		if (savedStyle === 'liquid-glass' || savedStyle === 'normal') {
+			currentStyle.value = savedStyle as ThemeStyle
+		}
+		// 读取模式
+		const savedMode = uni.getStorageSync('app_color_mode')
+		if (savedMode === 'light' || savedMode === 'dark' || savedMode === 'auto') {
+			currentMode.value = savedMode as ColorMode
 		}
 		initialized = true
 	}
 
-	const isLiquidGlass = computed(() => currentTheme.value === 'liquid-glass')
-	const isNormal = computed(() => currentTheme.value === 'normal')
+	/* ========== 计算属性 ========== */
+	const isNormal = computed(() => currentStyle.value === 'normal')
+	const isLiquidGlass = computed(() => currentStyle.value === 'liquid-glass')
 
-	function setTheme(theme: ThemeType) {
-		currentTheme.value = theme
-		uni.setStorageSync('app_theme', theme)
+	const isLight = computed(() => currentMode.value === 'light')
+	const isDark = computed(() => currentMode.value === 'dark')
+	const isAuto = computed(() => currentMode.value === 'auto')
+
+	// 综合主题类名（用于 CSS）
+	const themeClass = computed(() => {
+		const baseClass = currentStyle.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
+		const modeClass = currentMode.value === 'dark' ? 'mode-dark' : 'mode-light'
+		return `${baseClass} ${modeClass}`
+	})
+
+	/* ========== 风格切换 ========== */
+	function setStyle(style: ThemeStyle) {
+		if (currentStyle.value === style) return
+		currentStyle.value = style
+		uni.setStorageSync('app_theme_style', style)
 	}
 
-	function toggleTheme() {
-		const next: ThemeType = currentTheme.value === 'normal' ? 'liquid-glass' : 'normal'
-		setTheme(next)
+	function toggleStyle() {
+		const next: ThemeStyle = currentStyle.value === 'normal' ? 'liquid-glass' : 'normal'
+		setStyle(next)
 	}
 
+	/* ========== 模式切换 ========== */
+	function setMode(mode: ColorMode) {
+		if (currentMode.value === mode) return
+		currentMode.value = mode
+		uni.setStorageSync('app_color_mode', mode)
+	}
+
+	/* ========== 导出 ========== */
 	return {
-		currentTheme,
-		isLiquidGlass,
+		currentStyle,
+		currentMode,
 		isNormal,
-		setTheme,
-		toggleTheme,
+		isLiquidGlass,
+		isLight,
+		isDark,
+		isAuto,
+		themeClass,
+		setStyle,
+		setMode,
+		toggleStyle,
 	}
 }
