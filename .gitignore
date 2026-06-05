@@ -1,13 +1,18 @@
-node_modules/
-dist/
-unpackage/
+# HBuilderX
 .hbuilderx/
-.DS_Store
+unpackage/
+
+# Logs
 *.log
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp

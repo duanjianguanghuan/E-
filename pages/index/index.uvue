@@ -98,21 +98,41 @@
 		return '晚上好 🌙'
 	})
 
-	const quickActions = ref([
+	interface QuickAction {
+		icon: string
+		label: string
+	}
+
+	const quickActions = ref<QuickAction[]>([
 		{ icon: '🏖️', label: '景点' },
 		{ icon: '🍜', label: '美食' },
 		{ icon: '🏨', label: '住宿' },
 		{ icon: '🗺️', label: '路线' },
 	])
 
-	const recommendCards = ref([
+	interface RecommendCard {
+		emoji: string
+		title: string
+		desc: string
+		tag: string
+	}
+
+	const recommendCards = ref<RecommendCard[]>([
 		{ emoji: '🏔️', title: '雪山秘境', desc: '探索绝美雪山风光', tag: '热门' },
 		{ emoji: '🏖️', title: '海岸线之旅', desc: '阳光沙滩度假天堂', tag: '推荐' },
 		{ emoji: '🏯', title: '古镇漫步', desc: '体验千年文化韵味', tag: '新上线' },
 		{ emoji: '🌲', title: '森林徒步', desc: '拥抱大自然氧吧', tag: '精选' },
 	])
 
-	const activityList = ref([
+	interface ActivityItem {
+		emoji: string
+		title: string
+		desc: string
+		date: string
+		location: string
+	}
+
+	const activityList = ref<ActivityItem[]>([
 		{ emoji: '🎵', title: '夏日音乐节', desc: '海滩落日音乐盛宴', date: '7月15日', location: '三亚' },
 		{ emoji: '🎨', title: '城市艺术展', desc: '当代艺术沉浸体验', date: '7月20日', location: '上海' },
 		{ emoji: '🏃', title: '环湖马拉松', desc: '湖畔奔跑挑战自我', date: '8月1日', location: '杭州' },

@@ -1,0 +1,17 @@
+{
+  "name": "e-tour-weekly",
+  "version": "1.0.0",
+  "description": "E游周享 - 一个旅游主题的 uni-app x 应用",
+  "main": "main.uts",
+  "scripts": {
+    "dev": "echo '请使用 HBuilderX 打开项目进行开发'",
+    "build": "echo '请使用 HBuilderX 构建项目'"
+  },
+  "keywords": ["uni-app-x", "vue3", "mobile", "tourism"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {}
+}

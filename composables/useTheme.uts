@@ -2,12 +2,16 @@ import { ref, computed } from 'vue'
 
 export type ThemeType = 'normal' | 'liquid-glass'
 
+let initialized = false
 const currentTheme = ref<ThemeType>('normal')
 
 export function useTheme() {
-	const saved = uni.getStorageSync('app_theme')
-	if (saved === 'liquid-glass' || saved === 'normal') {
-		currentTheme.value = saved as ThemeType
+	if (!initialized) {
+		const saved = uni.getStorageSync('app_theme')
+		if (saved === 'liquid-glass' || saved === 'normal') {
+			currentTheme.value = saved as ThemeType
+		}
+		initialized = true
 	}
 
 	const isLiquidGlass = computed(() => currentTheme.value === 'liquid-glass')
