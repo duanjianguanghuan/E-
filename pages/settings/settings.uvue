@@ -17,7 +17,6 @@
 			<view :class="['section', themeClass]">
 				<view class="section-header">
 					<text :class="['section-title', themeClass]">颜色模式</text>
-					<text :class="['section-desc', themeClass]">选择浅色、深色或自动跟随系统</text>
 				</view>
 
 				<!-- 浅色模式 -->
@@ -32,7 +31,7 @@
 								<text class="check-text">✓</text>
 							</view>
 						</view>
-						<text :class="['mode-desc', themeClass]">明亮清爽</text>
+						<text :class="['mode-desc', themeClass]">明亮清爽，适合白天使用</text>
 					</view>
 				</view>
 
@@ -48,7 +47,7 @@
 								<text class="check-text">✓</text>
 							</view>
 						</view>
-						<text :class="['mode-desc', themeClass]">省电护眼</text>
+						<text :class="['mode-desc', themeClass]">省电护眼，适合夜间使用</text>
 					</view>
 				</view>
 
@@ -64,7 +63,7 @@
 								<text class="check-text">✓</text>
 							</view>
 						</view>
-						<text :class="['mode-desc', themeClass]">自动切换</text>
+						<text :class="['mode-desc', themeClass]">自动切换，与系统同步</text>
 					</view>
 				</view>
 			</view>
@@ -73,7 +72,6 @@
 			<view :class="['section', themeClass]">
 				<view class="section-header">
 					<text :class="['section-title', themeClass]">界面风格</text>
-					<text :class="['section-desc', themeClass]">选择你的专属风格</text>
 				</view>
 
 				<!-- 经典简约 -->
@@ -117,10 +115,66 @@
 				</view>
 			</view>
 
+			<!-- 缓存与数据 -->
+			<view :class="['section', themeClass]">
+				<view class="section-header">
+					<text :class="['section-title', themeClass]">缓存与数据</text>
+				</view>
+
+				<view :class="['action-item', themeClass]" @tap="onClearCache">
+					<view class="action-left">
+						<text :class="['action-icon', themeClass]">🗑</text>
+						<text :class="['action-label', themeClass]">清除缓存</text>
+					</view>
+					<view class="action-right">
+						<text :class="['action-value', themeClass]">{{ cacheSize }}</text>
+						<text :class="['action-arrow', themeClass]">›</text>
+					</view>
+				</view>
+
+				<view :class="['action-item', themeClass, 'last-item']" @tap="onRefreshData">
+					<view class="action-left">
+						<text :class="['action-icon', themeClass]">🔄</text>
+						<text :class="['action-label', themeClass]">刷新数据</text>
+					</view>
+					<view class="action-right">
+						<text :class="['action-arrow', themeClass]">›</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 其他 -->
+			<view :class="['section', themeClass]">
+				<view class="section-header">
+					<text :class="['section-title', themeClass]">其他</text>
+				</view>
+
+				<view :class="['action-item', themeClass]" @tap="onCheckUpdate">
+					<view class="action-left">
+						<text :class="['action-icon', themeClass]">📦</text>
+						<text :class="['action-label', themeClass]">检查更新</text>
+					</view>
+					<view class="action-right">
+						<text :class="['action-value', themeClass]">v1.0.0</text>
+						<text :class="['action-arrow', themeClass]">›</text>
+					</view>
+				</view>
+
+				<view :class="['action-item', themeClass, 'last-item']" @tap="onFeedback">
+					<view class="action-left">
+						<text :class="['action-icon', themeClass]">💬</text>
+						<text :class="['action-label', themeClass]">意见反馈</text>
+					</view>
+					<view class="action-right">
+						<text :class="['action-arrow', themeClass]">›</text>
+					</view>
+				</view>
+			</view>
+
 			<!-- 关于 -->
 			<view :class="['section', themeClass]">
 				<view class="section-header">
-					<text :class="['section-title', themeClass]">关于应用</text>
+					<text :class="['section-title', themeClass]">关于</text>
 				</view>
 
 				<view :class="['info-item', themeClass]">
@@ -138,9 +192,14 @@
 					<text :class="['info-value', themeClass]">60s.viki.moe</text>
 				</view>
 
-				<view :class="['info-item', 'info-item-last', themeClass]">
+				<view :class="['info-item', themeClass]">
 					<text :class="['info-label', themeClass]">功能</text>
 					<text :class="['info-value', themeClass]">Epic 免费游戏资讯</text>
+				</view>
+
+				<view :class="['info-item', 'info-item-last', themeClass]">
+					<text :class="['info-label', themeClass]">兼容性</text>
+					<text :class="['info-value', themeClass]">Android 8+ / iOS 13+ / HarmonyOS</text>
 				</view>
 			</view>
 
@@ -153,7 +212,8 @@
 <script setup lang="uts">
 	import { useTheme } from '@/composables/useTheme'
 	import type { ThemeStyle, ColorMode } from '@/composables/useTheme'
-	import { computed } from 'vue'
+	import { clearCache } from '@/api/epic'
+	import { ref, computed } from 'vue'
 
 	const {
 		currentStyle,
@@ -167,6 +227,14 @@
 		setStyle,
 		setMode,
 	} = useTheme()
+
+	/* ========== 缓存大小 ========== */
+	const cacheSize = ref('0 KB')
+
+	function updateCacheSize() {
+		// 在实际应用中，这里应该计算真实缓存大小
+		cacheSize.value = '0 KB'
+	}
 
 	/* ========== 主题风格切换 ========== */
 	function onSelectStyle(style: ThemeStyle) {
@@ -194,10 +262,73 @@
 		})
 	}
 
+	/* ========== 清除缓存 ========== */
+	function onClearCache() {
+		uni.showModal({
+			title: '清除缓存',
+			content: '确定要清除所有缓存数据吗？',
+			confirmColor: '#007aff',
+			success: (res) => {
+				if (res.confirm) {
+					clearCache()
+					cacheSize.value = '0 KB'
+					uni.showToast({
+						title: '缓存已清除',
+						icon: 'success',
+						duration: 2000,
+					})
+				}
+			},
+		})
+	}
+
+	/* ========== 刷新数据 ========== */
+	function onRefreshData() {
+		uni.showToast({
+			title: '正在刷新数据...',
+			icon: 'loading',
+			duration: 1500,
+		})
+		// 触发首页刷新
+		const pages = getCurrentPages()
+		const prevPage = pages[pages.length - 2]
+		if (prevPage) {
+			prevPage.$vm.loadGames?.(true)
+		}
+		setTimeout(() => {
+			uni.showToast({
+				title: '数据已刷新',
+				icon: 'success',
+				duration: 1500,
+			})
+		}, 1500)
+	}
+
+	/* ========== 检查更新 ========== */
+	function onCheckUpdate() {
+		uni.showToast({
+			title: '当前已是最新版本',
+			icon: 'none',
+			duration: 2000,
+		})
+	}
+
+	/* ========== 意见反馈 ========== */
+	function onFeedback() {
+		uni.showToast({
+			title: '感谢您的支持',
+			icon: 'none',
+			duration: 2000,
+		})
+	}
+
 	/* ========== 返回 ========== */
 	function goBack() {
 		uni.navigateBack({})
 	}
+
+	/* ========== 初始化 ========== */
+	updateCacheSize()
 </script>
 
 <style>
@@ -258,12 +389,6 @@
 	.section-title {
 		font-size: 16px;
 		font-weight: 700;
-		display: block;
-	}
-
-	.section-desc {
-		font-size: 12px;
-		margin-top: 4px;
 		display: block;
 	}
 
@@ -331,10 +456,6 @@
 
 	.theme-normal.mode-light .section-title {
 		color: #1c1c1e;
-	}
-
-	.theme-normal.mode-light .section-desc {
-		color: #8e8e93;
 	}
 
 	.theme-normal.mode-light .mode-card {
@@ -516,6 +637,49 @@
 		margin-top: 4px;
 	}
 
+	.theme-normal.mode-light .action-item {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 14px 4px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.theme-normal.mode-light .action-item.last-item {
+		border-bottom: none;
+	}
+
+	.theme-normal.mode-light .action-left {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-normal.mode-light .action-icon {
+		font-size: 18px;
+		margin-right: 10px;
+	}
+
+	.theme-normal.mode-light .action-label {
+		font-size: 15px;
+		color: #1c1c1e;
+	}
+
+	.theme-normal.mode-light .action-right {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-normal.mode-light .action-value {
+		font-size: 14px;
+		color: #8e8e93;
+		margin-right: 6px;
+	}
+
+	.theme-normal.mode-light .action-arrow {
+		font-size: 18px;
+		color: #d1d1d6;
+	}
+
 	.theme-normal.mode-light .info-label {
 		color: #1c1c1e;
 	}
@@ -551,10 +715,6 @@
 
 	.theme-normal.mode-dark .section-title {
 		color: #f5f5f7;
-	}
-
-	.theme-normal.mode-dark .section-desc {
-		color: #8e8e93;
 	}
 
 	.theme-normal.mode-dark .mode-card {
@@ -736,6 +896,49 @@
 		margin-top: 4px;
 	}
 
+	.theme-normal.mode-dark .action-item {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 14px 4px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.theme-normal.mode-dark .action-item.last-item {
+		border-bottom: none;
+	}
+
+	.theme-normal.mode-dark .action-left {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-normal.mode-dark .action-icon {
+		font-size: 18px;
+		margin-right: 10px;
+	}
+
+	.theme-normal.mode-dark .action-label {
+		font-size: 15px;
+		color: #f5f5f7;
+	}
+
+	.theme-normal.mode-dark .action-right {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-normal.mode-dark .action-value {
+		font-size: 14px;
+		color: #8e8e93;
+		margin-right: 6px;
+	}
+
+	.theme-normal.mode-dark .action-arrow {
+		font-size: 18px;
+		color: #48484a;
+	}
+
 	.theme-normal.mode-dark .info-label {
 		color: #f5f5f7;
 	}
@@ -782,11 +985,6 @@
 		text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 	}
 
-	.theme-glass.mode-light .section-desc {
-		color: #6b7aa1;
-	}
-
-	/* 颜色模式卡片 */
 	.theme-glass.mode-light .mode-card {
 		flex-direction: row;
 		align-items: center;
@@ -883,7 +1081,6 @@
 		box-shadow: 0 2px 8px rgba(91, 124, 245, 0.3);
 	}
 
-	/* 主题风格卡片 */
 	.theme-glass.mode-light .theme-card {
 		flex-direction: row;
 		align-items: center;
@@ -978,6 +1175,51 @@
 		margin-top: 4px;
 	}
 
+	.theme-glass.mode-light .action-item {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 14px 4px;
+		border-bottom: 1px solid rgba(100, 120, 200, 0.08);
+	}
+
+	.theme-glass.mode-light .action-item.last-item {
+		border-bottom: none;
+	}
+
+	.theme-glass.mode-light .action-left {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-glass.mode-light .action-icon {
+		font-size: 18px;
+		margin-right: 10px;
+	}
+
+	.theme-glass.mode-light .action-label {
+		font-size: 15px;
+		color: #2d3561;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+	}
+
+	.theme-glass.mode-light .action-right {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-glass.mode-light .action-value {
+		font-size: 14px;
+		color: #6b7aa1;
+		margin-right: 6px;
+	}
+
+	.theme-glass.mode-light .action-arrow {
+		font-size: 18px;
+		color: #b0c0e0;
+		text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+	}
+
 	.theme-glass.mode-light .info-label {
 		color: #2d3561;
 		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
@@ -1025,11 +1267,6 @@
 		text-shadow: 0 0 20px rgba(120, 160, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
 
-	.theme-glass.mode-dark .section-desc {
-		color: rgba(150, 170, 220, 0.55);
-	}
-
-	/* 颜色模式卡片 */
 	.theme-glass.mode-dark .mode-card {
 		flex-direction: row;
 		align-items: center;
@@ -1126,7 +1363,6 @@
 		box-shadow: 0 2px 10px rgba(100, 130, 255, 0.5), 0 0 20px rgba(100, 130, 255, 0.2);
 	}
 
-	/* 主题风格卡片 */
 	.theme-glass.mode-dark .theme-card {
 		flex-direction: row;
 		align-items: center;
@@ -1219,6 +1455,51 @@
 		font-size: 12px;
 		color: rgba(150, 170, 220, 0.55);
 		margin-top: 4px;
+	}
+
+	.theme-glass.mode-dark .action-item {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 14px 4px;
+		border-bottom: 1px solid rgba(100, 120, 255, 0.08);
+	}
+
+	.theme-glass.mode-dark .action-item.last-item {
+		border-bottom: none;
+	}
+
+	.theme-glass.mode-dark .action-left {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-glass.mode-dark .action-icon {
+		font-size: 18px;
+		margin-right: 10px;
+	}
+
+	.theme-glass.mode-dark .action-label {
+		font-size: 15px;
+		color: rgba(220, 230, 255, 0.88);
+		text-shadow: 0 0 15px rgba(120, 160, 255, 0.2);
+	}
+
+	.theme-glass.mode-dark .action-right {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.theme-glass.mode-dark .action-value {
+		font-size: 14px;
+		color: rgba(150, 170, 220, 0.5);
+		margin-right: 6px;
+	}
+
+	.theme-glass.mode-dark .action-arrow {
+		font-size: 18px;
+		color: rgba(100, 120, 180, 0.4);
+		text-shadow: 0 0 10px rgba(100, 130, 255, 0.2);
 	}
 
 	.theme-glass.mode-dark .info-label {
