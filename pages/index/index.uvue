@@ -92,7 +92,11 @@
 								@tap="openGameLink(game)"
 							>
 								<view class="game-cover-wrap">
+									<view v-if="isImageFailed(game.id)" :class="['game-cover', 'cover-placeholder', themeClass]">
+										<text :class="['cover-placeholder-text', themeClass]">🎮</text>
+									</view>
 									<image
+										v-else
 										:class="['game-cover', themeClass]"
 										:src="game.cover"
 										mode="aspectFill"
@@ -133,7 +137,11 @@
 							:key="game.id"
 							@tap="openGameLink(game)"
 						>
+							<view v-if="isImageFailed(game.id)" :class="['upcoming-thumb', 'thumb-placeholder', themeClass]">
+								<text :class="['thumb-placeholder-text', themeClass]">🎮</text>
+							</view>
 							<image
+								v-else
 								:class="['upcoming-thumb', themeClass]"
 								:src="game.cover"
 								mode="aspectFill"
@@ -179,7 +187,7 @@
 	import type { EpicGame } from '@/api/epic'
 	import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-	const { currentTheme, themeClass } = useTheme()
+	const { themeClass } = useTheme()
 
 	/* ========== 状态 ========== */
 	const isSkeleton = ref(true)
@@ -189,10 +197,21 @@
 	const upcomingGames = ref<EpicGame[]>([])
 	const lastUpdateTime = ref<string | null>(null)
 	const currentTime = ref(Date.now())
+	const failedImages = ref<Set<string>>(new Set())
 
 	const hasError = computed(() => errorMsg.value !== null)
 	const isEmpty = computed(() => !isSkeleton.value && !hasError.value && freeNowGames.value.length === 0 && upcomingGames.value.length === 0)
 	const greeting = computed(() => getFriendlyTime() + '，玩家')
+
+	/* ========== 图片加载处理 ========== */
+	function onImageError(e: any, gameId: string) {
+		failedImages.value.add(gameId)
+		console.log('Image load error:', gameId)
+	}
+
+	function isImageFailed(gameId: string): boolean {
+		return failedImages.value.has(gameId)
+	}
 
 	/* ========== 时间更新定时器 ========== */
 	let timer: number | null = null
@@ -209,11 +228,6 @@
 			clearInterval(timer as unknown as number)
 			timer = null
 		}
-	}
-
-	/* ========== 时间显示工具 ========== */
-	function getTimeDisplayForGame(game: EpicGame) {
-		return getTimeDisplay(game.free_end, game.free_end_at, game.is_free_now)
 	}
 
 	/* ========== 数据加载 ========== */
@@ -266,11 +280,6 @@
 	/* ========== 滚动到底部 ========== */
 	function onScrollBottom() {
 		// 预留扩展：加载更多
-	}
-
-	/* ========== 图片加载失败 ========== */
-	function onImageError(e: any, gameId: string) {
-		console.log('Image load error:', gameId, e)
 	}
 
 	/* ========== 打开游戏链接 ========== */
@@ -541,6 +550,33 @@
 	.game-cover {
 		width: 200px;
 		height: 112px;
+	}
+
+	.cover-placeholder {
+		width: 200px;
+		height: 112px;
+		align-items: center;
+		justify-content: center;
+		background-color: #e8e8ed;
+	}
+
+	.cover-placeholder-text {
+		font-size: 32px;
+	}
+
+	.thumb-placeholder {
+		width: 56px;
+		height: 36px;
+		border-radius: 6px;
+		margin-right: 12px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		background-color: #e8e8ed;
+	}
+
+	.thumb-placeholder-text {
+		font-size: 18px;
 	}
 
 	.free-tag {
@@ -913,6 +949,14 @@
 		background-color: #2c2c2e;
 	}
 
+	.theme-normal.mode-dark .cover-placeholder {
+		background-color: #2c2c2e;
+	}
+
+	.theme-normal.mode-dark .thumb-placeholder {
+		background-color: #2c2c2e;
+	}
+
 	.theme-normal.mode-dark .free-tag {
 		color: rgba(150, 255, 180, 0.95);
 		background-color: rgba(52, 199, 89, 0.3);
@@ -1089,6 +1133,14 @@
 
 	.theme-glass.mode-light .game-cover {
 		background: linear-gradient(180deg, rgba(120, 140, 255, 0.12) 0%, rgba(180, 200, 255, 0.08) 100%);
+	}
+
+	.theme-glass.mode-light .cover-placeholder {
+		background: linear-gradient(180deg, rgba(120, 140, 255, 0.15) 0%, rgba(180, 200, 255, 0.1) 100%);
+	}
+
+	.theme-glass.mode-light .thumb-placeholder {
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.12) 0%, rgba(180, 200, 255, 0.08) 100%);
 	}
 
 	.theme-glass.mode-light .free-tag {
@@ -1279,6 +1331,14 @@
 
 	.theme-glass.mode-dark .game-cover {
 		background: linear-gradient(180deg, rgba(80, 70, 160, 0.3) 0%, rgba(60, 55, 130, 0.2) 100%);
+	}
+
+	.theme-glass.mode-dark .cover-placeholder {
+		background: linear-gradient(180deg, rgba(80, 70, 160, 0.35) 0%, rgba(60, 55, 130, 0.25) 100%);
+	}
+
+	.theme-glass.mode-dark .thumb-placeholder {
+		background: linear-gradient(135deg, rgba(80, 70, 160, 0.35) 0%, rgba(60, 55, 130, 0.25) 100%);
 	}
 
 	.theme-glass.mode-dark .free-tag {

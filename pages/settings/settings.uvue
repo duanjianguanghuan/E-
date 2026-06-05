@@ -229,11 +229,25 @@
 	} = useTheme()
 
 	/* ========== 缓存大小 ========== */
-	const cacheSize = ref('0 KB')
+	const cacheSize = ref('暂无缓存')
 
 	function updateCacheSize() {
-		// 在实际应用中，这里应该计算真实缓存大小
-		cacheSize.value = '0 KB'
+		// 检查是否有缓存数据
+		try {
+			const cached = uni.getStorageInfoSync()
+			if (cached && cached.currentSize > 0) {
+				const sizeKB = cached.currentSize
+				if (sizeKB >= 1024) {
+					cacheSize.value = `${(sizeKB / 1024).toFixed(1)} MB`
+				} else {
+					cacheSize.value = `${sizeKB} KB`
+				}
+			} else {
+				cacheSize.value = '暂无缓存'
+			}
+		} catch {
+			cacheSize.value = '暂无缓存'
+		}
 	}
 
 	/* ========== 主题风格切换 ========== */
@@ -271,7 +285,12 @@
 			success: (res) => {
 				if (res.confirm) {
 					clearCache()
-					cacheSize.value = '0 KB'
+					try {
+						uni.clearStorageSync()
+					} catch {
+						// 忽略清除错误
+					}
+					updateCacheSize()
 					uni.showToast({
 						title: '缓存已清除',
 						icon: 'success',
@@ -292,16 +311,23 @@
 		// 触发首页刷新
 		const pages = getCurrentPages()
 		const prevPage = pages[pages.length - 2]
-		if (prevPage) {
-			prevPage.$vm.loadGames?.(true)
+		if (prevPage && prevPage.$vm.loadGames) {
+			prevPage.$vm.loadGames(true)
+			setTimeout(() => {
+				uni.showToast({
+					title: '数据已刷新',
+					icon: 'success',
+					duration: 1500,
+				})
+			}, 1500)
+		} else {
+			// 如果无法刷新上一页，尝试重新加载当前页数据
+			setTimeout(() => {
+				uni.reLaunch({
+					url: '/pages/index/index',
+				})
+			}, 1500)
 		}
-		setTimeout(() => {
-			uni.showToast({
-				title: '数据已刷新',
-				icon: 'success',
-				duration: 1500,
-			})
-		}, 1500)
 	}
 
 	/* ========== 检查更新 ========== */

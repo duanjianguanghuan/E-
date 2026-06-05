@@ -279,12 +279,30 @@ export function getRemainingMs(endTime: number | string | Date): number {
  * 获取时间显示信息
  */
 export function getTimeDisplay(freeEndStr: string, freeEndAt: number, isFreeNow: boolean): TimeDisplay {
+	// 如果时间戳无效（0或负数），默认显示已结束
+	if (!freeEndAt || freeEndAt <= 0) {
+		return {
+			text: '时间未知',
+			type: isFreeNow ? 'expired' : 'upcoming',
+			remaining: 0,
+			isUrgent: false,
+		}
+	}
+
 	if (!isFreeNow) {
 		// 即将推出的游戏
 		const remaining = getRemainingMs(freeEndAt)
 		const days = Math.floor(remaining / (1000 * 60 * 60 * 24))
 		const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
 
+		if (remaining <= 0) {
+			return {
+				text: '即将开始',
+				type: 'upcoming',
+				remaining: 0,
+				isUrgent: true,
+			}
+		}
 		if (days > 0) {
 			return {
 				text: `${days} 天后开始`,

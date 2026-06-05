@@ -12,6 +12,24 @@ let initialized = false
 const currentStyle = ref<ThemeStyle>('normal')
 const currentMode = ref<ColorMode>('auto')
 
+// 检测系统深色模式
+function getSystemDarkMode(): boolean {
+	try {
+		const info = uni.getSystemInfoSync()
+		return info.theme === 'dark'
+	} catch {
+		return false
+	}
+}
+
+// 当前实际生效的颜色模式（考虑auto模式）
+const effectiveMode = computed(() => {
+	if (currentMode.value === 'auto') {
+		return getSystemDarkMode() ? 'dark' : 'light'
+	}
+	return currentMode.value
+})
+
 /* ========== 核心函数 ========== */
 export function useTheme() {
 	if (!initialized) {
@@ -32,14 +50,14 @@ export function useTheme() {
 	const isNormal = computed(() => currentStyle.value === 'normal')
 	const isLiquidGlass = computed(() => currentStyle.value === 'liquid-glass')
 
-	const isLight = computed(() => currentMode.value === 'light')
-	const isDark = computed(() => currentMode.value === 'dark')
+	const isLight = computed(() => effectiveMode.value === 'light')
+	const isDark = computed(() => effectiveMode.value === 'dark')
 	const isAuto = computed(() => currentMode.value === 'auto')
 
 	// 综合主题类名（用于 CSS）
 	const themeClass = computed(() => {
 		const baseClass = currentStyle.value === 'liquid-glass' ? 'theme-glass' : 'theme-normal'
-		const modeClass = currentMode.value === 'dark' ? 'mode-dark' : 'mode-light'
+		const modeClass = effectiveMode.value === 'dark' ? 'mode-dark' : 'mode-light'
 		return `${baseClass} ${modeClass}`
 	})
 
