@@ -383,10 +383,18 @@
 		height: 40px;
 		align-items: center;
 		justify-content: center;
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out;
+	}
+
+	.back-btn:active {
+		transform: scale(0.92);
 	}
 
 	.back-icon {
 		font-size: 22px;
+		transition: transform 0.15s ease-out;
 	}
 
 	.header-title {
@@ -492,10 +500,17 @@
 		background-color: #f8f8fa;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, border-color 0.2s ease;
 	}
 
 	.theme-normal.mode-light .mode-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-light .mode-card:active {
+		transform: scale(0.98);
 	}
 
 	.theme-normal.mode-light .mode-card.active {
@@ -581,10 +596,17 @@
 		background-color: #f8f8fa;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, border-color 0.2s ease;
 	}
 
 	.theme-normal.mode-light .theme-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-light .theme-card:active {
+		transform: scale(0.98);
 	}
 
 	.theme-normal.mode-light .theme-card.active {
@@ -669,6 +691,13 @@
 		justify-content: space-between;
 		padding: 14px 4px;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+		touch-action: manipulation;
+		user-select: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.theme-normal.mode-light .action-item:active {
+		background-color: rgba(0, 0, 0, 0.03);
 	}
 
 	.theme-normal.mode-light .action-item.last-item {
@@ -751,10 +780,17 @@
 		background-color: #2c2c2e;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, border-color 0.2s ease;
 	}
 
 	.theme-normal.mode-dark .mode-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-dark .mode-card:active {
+		transform: scale(0.98);
 	}
 
 	.theme-normal.mode-dark .mode-card.active {
@@ -840,10 +876,17 @@
 		background-color: #2c2c2e;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, border-color 0.2s ease;
 	}
 
 	.theme-normal.mode-dark .theme-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-normal.mode-dark .theme-card:active {
+		transform: scale(0.98);
 	}
 
 	.theme-normal.mode-dark .theme-card.active {
@@ -928,6 +971,13 @@
 		justify-content: space-between;
 		padding: 14px 4px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		touch-action: manipulation;
+		user-select: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.theme-normal.mode-dark .action-item:active {
+		background-color: rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-normal.mode-dark .action-item.last-item {
@@ -1020,10 +1070,18 @@
 		margin-bottom: 10px;
 		border: 1px solid rgba(100, 120, 200, 0.1);
 		box-shadow: 0 4px 12px rgba(100, 120, 200, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 	}
 
 	.theme-glass.mode-light .mode-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-light .mode-card:active {
+		transform: scale(0.98);
+		box-shadow: 0 2px 6px rgba(100, 120, 200, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.theme-glass.mode-light .mode-card.active {
@@ -1116,10 +1174,18 @@
 		margin-bottom: 10px;
 		border: 1px solid rgba(100, 120, 200, 0.1);
 		box-shadow: 0 4px 12px rgba(100, 120, 200, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 	}
 
 	.theme-glass.mode-light .theme-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-light .theme-card:active {
+		transform: scale(0.98);
+		box-shadow: 0 2px 6px rgba(100, 120, 200, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.theme-glass.mode-light .theme-card.active {
@@ -1207,6 +1273,13 @@
 		justify-content: space-between;
 		padding: 14px 4px;
 		border-bottom: 1px solid rgba(100, 120, 200, 0.08);
+		touch-action: manipulation;
+		user-select: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.theme-glass.mode-light .action-item:active {
+		background-color: rgba(91, 124, 245, 0.05);
 	}
 
 	.theme-glass.mode-light .action-item.last-item {
@@ -1302,10 +1375,18 @@
 		margin-bottom: 10px;
 		border: 1px solid rgba(100, 120, 255, 0.1);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 30px rgba(80, 100, 220, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 	}
 
 	.theme-glass.mode-dark .mode-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-dark .mode-card:active {
+		transform: scale(0.98);
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-glass.mode-dark .mode-card.active {
@@ -1398,10 +1479,18 @@
 		margin-bottom: 10px;
 		border: 1px solid rgba(100, 120, 255, 0.1);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 30px rgba(80, 100, 220, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 	}
 
 	.theme-glass.mode-dark .theme-card:last-child {
 		margin-bottom: 0;
+	}
+
+	.theme-glass.mode-dark .theme-card:active {
+		transform: scale(0.98);
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-glass.mode-dark .theme-card.active {
@@ -1489,6 +1578,13 @@
 		justify-content: space-between;
 		padding: 14px 4px;
 		border-bottom: 1px solid rgba(100, 120, 255, 0.08);
+		touch-action: manipulation;
+		user-select: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.theme-glass.mode-dark .action-item:active {
+		background-color: rgba(100, 120, 255, 0.08);
 	}
 
 	.theme-glass.mode-dark .action-item.last-item {

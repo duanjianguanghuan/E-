@@ -198,6 +198,7 @@
 	const lastUpdateTime = ref<string | null>(null)
 	const currentTime = ref(Date.now())
 	const failedImages = ref<Set<string>>(new Set())
+	const isPageActive = ref(true)
 
 	const hasError = computed(() => errorMsg.value !== null)
 	const isEmpty = computed(() => !isSkeleton.value && !hasError.value && freeNowGames.value.length === 0 && upcomingGames.value.length === 0)
@@ -213,14 +214,29 @@
 		return failedImages.value.has(gameId)
 	}
 
-	/* ========== 时间更新定时器 ========== */
+	/* ========== 优化的时间更新定时器 ========== */
 	let timer: number | null = null
+	let lastTimerTickTime: number = 0
 
 	function startTimer() {
 		if (timer !== null) return
-		timer = setInterval(() => {
-			currentTime.value = Date.now()
-		}, 1000) as unknown as number
+		
+		function tick() {
+			if (!isPageActive.value) return
+			
+			const now = Date.now()
+			// 节流：只有距离上次更新超过500ms才更新
+			if (now - lastTimerTickTime < 500) return
+			
+			lastTimerTickTime = now
+			currentTime.value = now
+		}
+		
+		// 立即执行第一次
+		tick()
+		
+		// 1000ms 间隔，合理的倒计时更新频率
+		timer = setInterval(tick, 1000) as unknown as number
 	}
 
 	function stopTimer() {
@@ -318,8 +334,26 @@
 		})
 	}
 
-	/* ========== 生命周期 ========== */
+	/* ========== 生命周期管理优化 ========== */
+	// 添加页面可见性检测
+	function onPageShow() {
+		isPageActive.value = true
+		// 页面显示时，更新当前时间并重启定时器（如果需要）
+		currentTime.value = Date.now()
+		lastTimerTickTime = currentTime.value
+		if (freeNowGames.value.length > 0) {
+			startTimer()
+		}
+	}
+
+	function onPageHide() {
+		isPageActive.value = false
+		// 页面隐藏时暂停定时器以节省资源
+		stopTimer()
+	}
+
 	onMounted(() => {
+		onPageShow()
 		loadGames()
 	})
 
@@ -383,10 +417,19 @@
 		align-items: center;
 		justify-content: center;
 		margin-left: 8px;
+		/* 添加点击反馈 */
+		touch-action: manipulation;
+		user-select: none;
 	}
 
 	.icon-text {
 		font-size: 18px;
+		transition: transform 0.1s ease-in-out;
+	}
+
+	/* 图标按钮点击反馈 */
+	.icon-btn:active {
+		transform: scale(0.95);
 	}
 
 	.content-scroll {
@@ -431,11 +474,38 @@
 	.skeleton-text {
 		height: 12px;
 		margin: 12px 14px 6px 14px;
+		animation: skeleton-pulse 1.5s ease-in-out infinite;
 	}
 
 	.skeleton-text.short {
 		width: 60%;
 		margin-top: 4px;
+		animation-delay: 0.2s;
+	}
+
+	.skeleton-header {
+		animation: skeleton-pulse 1.5s ease-in-out infinite;
+	}
+
+	.skeleton-img {
+		animation: skeleton-pulse 1.5s ease-in-out infinite;
+	}
+
+	.skeleton-thumb {
+		animation: skeleton-pulse 1.5s ease-in-out infinite;
+	}
+
+	/* 骨架屏闪烁动画 */
+	@keyframes skeleton-pulse {
+		0% {
+			opacity: 0.6;
+		}
+		50% {
+			opacity: 0.9;
+		}
+		100% {
+			opacity: 0.6;
+		}
 	}
 
 	.skeleton-list {
@@ -541,6 +611,14 @@
 		border-radius: 16px;
 		overflow: hidden;
 		flex-shrink: 0;
+		/* 点击反馈 */
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+	}
+
+	.game-card:active {
+		transform: scale(0.96);
 	}
 
 	.game-cover-wrap {
@@ -623,6 +701,14 @@
 		padding: 12px 14px;
 		margin-bottom: 10px;
 		border-radius: 14px;
+		/* 点击反馈 */
+		touch-action: manipulation;
+		user-select: none;
+		transition: transform 0.15s ease-out;
+	}
+
+	.upcoming-item:active {
+		transform: scale(0.98);
 	}
 
 	.upcoming-thumb {
