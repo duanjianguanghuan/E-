@@ -21,10 +21,7 @@
 				</view>
 
 				<!-- 浅色模式 -->
-				<view
-					:class="['mode-card', themeClass, { active: isLight }]"
-					@tap="onSelectMode('light')"
-				>
+				<view :class="['mode-card', themeClass, { active: isLight }]" @tap="onSelectMode('light')">
 					<view :class="['mode-visual', 'visual-light', themeClass]">
 						<view class="visual-circle"></view>
 					</view>
@@ -40,10 +37,7 @@
 				</view>
 
 				<!-- 深色模式 -->
-				<view
-					:class="['mode-card', themeClass, { active: isDark }]"
-					@tap="onSelectMode('dark')"
-				>
+				<view :class="['mode-card', themeClass, { active: isDark }]" @tap="onSelectMode('dark')">
 					<view :class="['mode-visual', 'visual-dark', themeClass]">
 						<view class="visual-circle"></view>
 					</view>
@@ -59,10 +53,7 @@
 				</view>
 
 				<!-- 跟随系统 -->
-				<view
-					:class="['mode-card', themeClass, { active: isAuto }]"
-					@tap="onSelectMode('auto')"
-				>
+				<view :class="['mode-card', themeClass, { active: isAuto }]" @tap="onSelectMode('auto')">
 					<view :class="['mode-visual', 'visual-auto', themeClass]">
 						<view class="visual-half-half"></view>
 					</view>
@@ -86,10 +77,7 @@
 				</view>
 
 				<!-- 经典简约 -->
-				<view
-					:class="['theme-card', themeClass, { active: isNormal }]"
-					@tap="onSelectStyle('normal')"
-				>
+				<view :class="['theme-card', themeClass, { active: isNormal }]" @tap="onSelectStyle('normal')">
 					<view :class="['card-visual', themeClass]">
 						<view class="visual-bar"></view>
 						<view class="visual-body">
@@ -109,10 +97,7 @@
 				</view>
 
 				<!-- 液体玻璃 -->
-				<view
-					:class="['theme-card', themeClass, { active: isLiquidGlass }]"
-					@tap="onSelectStyle('liquid-glass')"
-				>
+				<view :class="['theme-card', themeClass, { active: isLiquidGlass }]" @tap="onSelectStyle('liquid-glass')">
 					<view :class="['card-visual', 'visual-glass', themeClass]">
 						<view class="visual-bar glass-bar"></view>
 						<view class="visual-body">
@@ -153,7 +138,7 @@
 					<text :class="['info-value', themeClass]">60s.viki.moe</text>
 				</view>
 
-				<view :class="['info-item', themeClass]">
+				<view :class="['info-item', 'info-item-last', themeClass]">
 					<text :class="['info-label', themeClass]">功能</text>
 					<text :class="['info-value', themeClass]">Epic 免费游戏资讯</text>
 				</view>
@@ -228,7 +213,6 @@
 	.header {
 		flex-shrink: 0;
 		padding: 48px 20px 16px 20px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
 	.header-content {
@@ -353,7 +337,6 @@
 		color: #8e8e93;
 	}
 
-	/* 颜色模式卡片 */
 	.theme-normal.mode-light .mode-card {
 		flex-direction: row;
 		align-items: center;
@@ -443,7 +426,6 @@
 		background-color: #007aff;
 	}
 
-	/* 主题风格卡片 */
 	.theme-normal.mode-light .theme-card {
 		flex-direction: row;
 		align-items: center;
@@ -542,10 +524,6 @@
 		color: #8e8e93;
 	}
 
-	.theme-normal.mode-light .info-item + .info-item {
-		border-top: 1px solid rgba(0, 0, 0, 0.06);
-	}
-
 	/* ===================================== */
 	/*          经典简约 + 深色模式          */
 	/* ===================================== */
@@ -579,7 +557,6 @@
 		color: #8e8e93;
 	}
 
-	/* 颜色模式卡片 */
 	.theme-normal.mode-dark .mode-card {
 		flex-direction: row;
 		align-items: center;
@@ -669,13 +646,12 @@
 		background-color: #64d2ff;
 	}
 
-	/* 主题风格卡片 */
 	.theme-normal.mode-dark .theme-card {
 		flex-direction: row;
 		align-items: center;
 		padding: 12px;
 		border-radius: 14px;
-		background-color #2c2c2e;
+		background-color: #2c2c2e;
 		margin-bottom: 10px;
 		border: 2px solid transparent;
 	}
@@ -773,37 +749,41 @@
 	}
 
 	/* ===================================== */
-	/*          液体玻璃主题 + 浅色模式      */
+	/*      ✨ 液体玻璃主题 + 浅色模式 ✨     */
 	/* ===================================== */
 
 	.settings-page.theme-glass.mode-light {
-		background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 50%, #f6f8fb 100%);
+		background: linear-gradient(135deg, #f0f4ff 0%, #e8eef8 25%, #f5f8ff 50%, #eef4fb 75%, #f0f4ff 100%);
 	}
 
 	.theme-glass.mode-light .header {
-		background: rgba(255, 255, 255, 0.8);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.85) 100%);
+		border-bottom: 1px solid rgba(100, 120, 200, 0.08);
 	}
 
 	.theme-glass.mode-light .back-icon {
 		color: #5b7cf5;
+		text-shadow: 0 1px 2px rgba(91, 124, 245, 0.2);
 	}
 
 	.theme-glass.mode-light .header-title {
-		color: #1e293b;
+		color: #2d3561;
+		text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .section {
-		background: rgba(255, 255, 255, 0.7);
-		border: 1px solid rgba(91, 124, 245, 0.12);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 255, 0.82) 100%);
+		border: 1px solid rgba(100, 120, 200, 0.12);
+		box-shadow: 0 8px 24px rgba(100, 120, 200, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 	}
 
 	.theme-glass.mode-light .section-title {
-		color: #1e293b;
+		color: #2d3561;
+		text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .section-desc {
-		color: #64748b;
+		color: #6b7aa1;
 	}
 
 	/* 颜色模式卡片 */
@@ -812,9 +792,10 @@
 		align-items: center;
 		padding: 12px;
 		border-radius: 14px;
-		background-color: rgba(255, 255, 255, 0.6);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 255, 0.68) 100%);
 		margin-bottom: 10px;
-		border: 2px solid transparent;
+		border: 1px solid rgba(100, 120, 200, 0.1);
+		box-shadow: 0 4px 12px rgba(100, 120, 200, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.theme-glass.mode-light .mode-card:last-child {
@@ -822,8 +803,9 @@
 	}
 
 	.theme-glass.mode-light .mode-card.active {
-		border-color: #5b7cf5;
-		background-color: rgba(91, 124, 245, 0.08);
+		border-color: rgba(91, 124, 245, 0.5);
+		background: linear-gradient(180deg, rgba(120, 140, 255, 0.12) 0%, rgba(140, 160, 255, 0.08) 100%);
+		box-shadow: 0 4px 16px rgba(91, 124, 245, 0.15), 0 0 20px rgba(91, 124, 245, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 	}
 
 	.theme-glass.mode-light .mode-visual {
@@ -838,15 +820,18 @@
 	}
 
 	.theme-glass.mode-light .visual-light {
-		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+		background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%);
+		box-shadow: 0 2px 8px rgba(100, 120, 200, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .visual-dark {
-		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+		background: linear-gradient(135deg, #3a3a3c 0%, #2c2c2e 100%);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 	}
 
 	.theme-glass.mode-light .visual-auto {
-		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
 	.theme-glass.mode-light .visual-circle {
@@ -883,17 +868,19 @@
 	.theme-glass.mode-light .mode-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1e293b;
+		color: #2d3561;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .mode-desc {
 		font-size: 12px;
-		color: #64748b;
+		color: #6b7aa1;
 		margin-top: 4px;
 	}
 
 	.theme-glass.mode-light .check-icon {
-		background-color: #5b7cf5;
+		background: linear-gradient(135deg, #5b7cf5 0%, #6b8cf5 100%);
+		box-shadow: 0 2px 8px rgba(91, 124, 245, 0.3);
 	}
 
 	/* 主题风格卡片 */
@@ -902,9 +889,10 @@
 		align-items: center;
 		padding: 12px;
 		border-radius: 14px;
-		background-color: rgba(255, 255, 255, 0.6);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 255, 0.68) 100%);
 		margin-bottom: 10px;
-		border: 2px solid transparent;
+		border: 1px solid rgba(100, 120, 200, 0.1);
+		box-shadow: 0 4px 12px rgba(100, 120, 200, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.theme-glass.mode-light .theme-card:last-child {
@@ -912,8 +900,9 @@
 	}
 
 	.theme-glass.mode-light .theme-card.active {
-		border-color: #5b7cf5;
-		background-color: rgba(91, 124, 245, 0.08);
+		border-color: rgba(91, 124, 245, 0.5);
+		background: linear-gradient(180deg, rgba(120, 140, 255, 0.12) 0%, rgba(140, 160, 255, 0.08) 100%);
+		box-shadow: 0 4px 16px rgba(91, 124, 245, 0.15), 0 0 20px rgba(91, 124, 245, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 	}
 
 	.theme-glass.mode-light .card-visual {
@@ -923,20 +912,21 @@
 		overflow: hidden;
 		margin-right: 12px;
 		flex-shrink: 0;
-		background: linear-gradient(135deg, rgba(200, 208, 240, 0.4), rgba(220, 212, 255, 0.3));
+		background: linear-gradient(135deg, rgba(200, 210, 250, 0.5) 0%, rgba(220, 212, 255, 0.4) 100%);
+		border: 1px solid rgba(100, 120, 200, 0.1);
 	}
 
 	.theme-glass.mode-light .visual-glass {
-		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+		background: linear-gradient(135deg, rgba(140, 160, 255, 0.25) 0%, rgba(180, 150, 255, 0.2) 100%);
 	}
 
 	.theme-glass.mode-light .visual-bar {
 		height: 10px;
-		background-color: rgba(100, 116, 139, 0.2);
+		background: linear-gradient(90deg, rgba(180, 190, 220, 0.4) 0%, rgba(200, 190, 230, 0.3) 100%);
 	}
 
 	.theme-glass.mode-light .glass-bar {
-		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.7) 0%, rgba(180, 140, 255, 0.5) 100%);
 	}
 
 	.theme-glass.mode-light .visual-body {
@@ -949,7 +939,7 @@
 	.theme-glass.mode-light .visual-block {
 		height: 7px;
 		border-radius: 3px;
-		background-color: rgba(100, 116, 139, 0.15);
+		background: rgba(150, 160, 200, 0.25);
 	}
 
 	.theme-glass.mode-light .visual-block.w80 {
@@ -961,7 +951,7 @@
 	}
 
 	.theme-glass.mode-light .glass-block {
-		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.7) 0%, rgba(180, 140, 255, 0.5) 100%);
 	}
 
 	.theme-glass.mode-light .card-body {
@@ -978,59 +968,65 @@
 	.theme-glass.mode-light .card-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1e293b;
+		color: #2d3561;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .card-desc {
 		font-size: 12px;
-		color: #64748b;
+		color: #6b7aa1;
 		margin-top: 4px;
 	}
 
 	.theme-glass.mode-light .info-label {
-		color: #1e293b;
+		color: #2d3561;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-light .info-value {
-		color: #64748b;
+		color: #6b7aa1;
 	}
 
 	.theme-glass.mode-light .info-item + .info-item {
-		border-top: 1px solid rgba(91, 124, 245, 0.1);
+		border-top: 1px solid rgba(100, 120, 200, 0.08);
 	}
 
 	/* ===================================== */
-	/*          液体玻璃主题 + 深色模式      */
+	/*      ✨ 液体玻璃主题 + 深色模式 ✨     */
 	/* ===================================== */
 
 	.settings-page.theme-glass.mode-dark {
-		background: linear-gradient(135deg, #0a0a1a 0%, #1a1030 30%, #0d1b2a 60%, #0a0a1a 100%);
+		background: linear-gradient(135deg, #080818 0%, #12102a 20%, #0a1628 40%, #0e0f22 60%, #0c0c20 80%, #080818 100%);
 	}
 
 	.theme-glass.mode-dark .header {
-		background: rgba(255, 255, 255, 0.04);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		background: linear-gradient(180deg, rgba(30, 25, 60, 0.85) 0%, rgba(20, 18, 40, 0.75) 100%);
+		border-bottom: 1px solid rgba(120, 140, 255, 0.08);
 	}
 
 	.theme-glass.mode-dark .back-icon {
-		color: rgba(160, 200, 255, 0.9);
+		color: rgba(150, 190, 255, 0.95);
+		text-shadow: 0 0 10px rgba(120, 160, 255, 0.4);
 	}
 
 	.theme-glass.mode-dark .header-title {
-		color: rgba(255, 255, 255, 0.92);
+		color: rgba(220, 230, 255, 0.95);
+		text-shadow: 0 0 20px rgba(120, 160, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
 
 	.theme-glass.mode-dark .section {
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: linear-gradient(180deg, rgba(50, 45, 100, 0.45) 0%, rgba(35, 30, 80, 0.35) 100%);
+		border: 1px solid rgba(100, 120, 255, 0.12);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 50px rgba(80, 100, 220, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-glass.mode-dark .section-title {
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(220, 230, 255, 0.92);
+		text-shadow: 0 0 20px rgba(120, 160, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
 
 	.theme-glass.mode-dark .section-desc {
-		color: rgba(190, 205, 235, 0.5);
+		color: rgba(150, 170, 220, 0.55);
 	}
 
 	/* 颜色模式卡片 */
@@ -1039,9 +1035,10 @@
 		align-items: center;
 		padding: 12px;
 		border-radius: 14px;
-		background-color: rgba(255, 255, 255, 0.04);
+		background: linear-gradient(180deg, rgba(45, 40, 90, 0.4) 0%, rgba(30, 28, 70, 0.3) 100%);
 		margin-bottom: 10px;
-		border: 2px solid transparent;
+		border: 1px solid rgba(100, 120, 255, 0.1);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 30px rgba(80, 100, 220, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-glass.mode-dark .mode-card:last-child {
@@ -1049,8 +1046,9 @@
 	}
 
 	.theme-glass.mode-dark .mode-card.active {
-		border-color: rgba(140, 170, 255, 0.4);
-		background-color: rgba(120, 150, 255, 0.1);
+		border-color: rgba(120, 150, 255, 0.5);
+		background: linear-gradient(180deg, rgba(80, 100, 200, 0.25) 0%, rgba(60, 80, 180, 0.18) 100%);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(100, 130, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	}
 
 	.theme-glass.mode-dark .mode-visual {
@@ -1065,15 +1063,18 @@
 	}
 
 	.theme-glass.mode-dark .visual-light {
-		background: linear-gradient(135deg, #fafafa, #e8e8ed);
+		background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 	}
 
 	.theme-glass.mode-dark .visual-dark {
-		background: linear-gradient(135deg, #2c2c2e, #1d1d1f);
+		background: linear-gradient(135deg, #3a3a3c 0%, #2c2c2e 100%);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
 
 	.theme-glass.mode-dark .visual-auto {
-		background: linear-gradient(135deg, #fafafa 50%, #1d1d1f 50%);
+		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 	}
 
 	.theme-glass.mode-dark .visual-circle {
@@ -1081,7 +1082,7 @@
 		height: 20px;
 		border-radius: 10px;
 		background-color: rgba(255, 255, 255, 0.9);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 	}
 
 	.theme-glass.mode-dark .visual-dark .visual-circle {
@@ -1093,7 +1094,7 @@
 		height: 24px;
 		border-radius: 12px;
 		background: linear-gradient(135deg, #ffffff 50%, #3a3a3c 50%);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 	}
 
 	.theme-glass.mode-dark .mode-body {
@@ -1110,18 +1111,19 @@
 	.theme-glass.mode-dark .mode-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: rgba(240, 245, 255, 0.9);
+		color: rgba(220, 230, 255, 0.92);
+		text-shadow: 0 0 15px rgba(120, 160, 255, 0.2);
 	}
 
 	.theme-glass.mode-dark .mode-desc {
 		font-size: 12px;
-		color: rgba(190, 205, 235, 0.5);
+		color: rgba(150, 170, 220, 0.55);
 		margin-top: 4px;
 	}
 
 	.theme-glass.mode-dark .check-icon {
-		background: rgba(120, 160, 255, 0.8);
-		box-shadow: 0 0 12px rgba(120, 160, 255, 0.3);
+		background: linear-gradient(135deg, rgba(120, 150, 255, 0.9) 0%, rgba(140, 170, 255, 0.85) 100%);
+		box-shadow: 0 2px 10px rgba(100, 130, 255, 0.5), 0 0 20px rgba(100, 130, 255, 0.2);
 	}
 
 	/* 主题风格卡片 */
@@ -1130,9 +1132,10 @@
 		align-items: center;
 		padding: 12px;
 		border-radius: 14px;
-		background-color: rgba(255, 255, 255, 0.04);
+		background: linear-gradient(180deg, rgba(45, 40, 90, 0.4) 0%, rgba(30, 28, 70, 0.3) 100%);
 		margin-bottom: 10px;
-		border: 2px solid transparent;
+		border: 1px solid rgba(100, 120, 255, 0.1);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 30px rgba(80, 100, 220, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
 	.theme-glass.mode-dark .theme-card:last-child {
@@ -1140,9 +1143,9 @@
 	}
 
 	.theme-glass.mode-dark .theme-card.active {
-		border-color: rgba(140, 170, 255, 0.4);
-		background-color: rgba(120, 150, 255, 0.1);
-		box-shadow: 0 0 20px rgba(100, 140, 255, 0.15);
+		border-color: rgba(120, 150, 255, 0.5);
+		background: linear-gradient(180deg, rgba(80, 100, 200, 0.25) 0%, rgba(60, 80, 180, 0.18) 100%);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(100, 130, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	}
 
 	.theme-glass.mode-dark .card-visual {
@@ -1152,20 +1155,21 @@
 		overflow: hidden;
 		margin-right: 12px;
 		flex-shrink: 0;
-		background: rgba(255, 255, 255, 0.06);
+		background: linear-gradient(135deg, rgba(80, 70, 160, 0.4) 0%, rgba(60, 55, 130, 0.3) 100%);
+		border: 1px solid rgba(100, 120, 255, 0.08);
 	}
 
 	.theme-glass.mode-dark .visual-glass {
-		background: linear-gradient(135deg, rgba(120, 140, 255, 0.2), rgba(160, 120, 255, 0.15));
+		background: linear-gradient(135deg, rgba(120, 140, 255, 0.25) 0%, rgba(160, 120, 255, 0.2) 100%);
 	}
 
 	.theme-glass.mode-dark .visual-bar {
 		height: 10px;
-		background: rgba(255, 255, 255, 0.08);
+		background: linear-gradient(90deg, rgba(100, 120, 200, 0.3) 0%, rgba(120, 110, 180, 0.2) 100%);
 	}
 
 	.theme-glass.mode-dark .glass-bar {
-		background: linear-gradient(135deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+		background: linear-gradient(135deg, rgba(140, 170, 255, 0.7) 0%, rgba(180, 140, 255, 0.5) 100%);
 	}
 
 	.theme-glass.mode-dark .visual-body {
@@ -1178,7 +1182,7 @@
 	.theme-glass.mode-dark .visual-block {
 		height: 7px;
 		border-radius: 3px;
-		background-color: rgba(255, 255, 255, 0.08);
+		background: rgba(100, 120, 200, 0.25);
 	}
 
 	.theme-glass.mode-dark .visual-block.w80 {
@@ -1190,7 +1194,7 @@
 	}
 
 	.theme-glass.mode-dark .glass-block {
-		background: linear-gradient(90deg, rgba(140, 170, 255, 0.6), rgba(180, 140, 255, 0.4));
+		background: linear-gradient(90deg, rgba(140, 170, 255, 0.7) 0%, rgba(180, 140, 255, 0.5) 100%);
 	}
 
 	.theme-glass.mode-dark .card-body {
@@ -1207,24 +1211,26 @@
 	.theme-glass.mode-dark .card-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: rgba(235, 240, 255, 0.9);
+		color: rgba(220, 230, 255, 0.92);
+		text-shadow: 0 0 15px rgba(120, 160, 255, 0.2);
 	}
 
 	.theme-glass.mode-dark .card-desc {
 		font-size: 12px;
-		color: rgba(180, 195, 225, 0.5);
+		color: rgba(150, 170, 220, 0.55);
 		margin-top: 4px;
 	}
 
 	.theme-glass.mode-dark .info-label {
-		color: rgba(235, 240, 255, 0.85);
+		color: rgba(220, 230, 255, 0.88);
+		text-shadow: 0 0 15px rgba(120, 160, 255, 0.2);
 	}
 
 	.theme-glass.mode-dark .info-value {
-		color: rgba(190, 205, 235, 0.5);
+		color: rgba(150, 170, 220, 0.5);
 	}
 
 	.theme-glass.mode-dark .info-item + .info-item {
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-top: 1px solid rgba(100, 120, 255, 0.08);
 	}
 </style>
